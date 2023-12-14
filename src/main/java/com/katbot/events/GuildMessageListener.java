@@ -1,9 +1,6 @@
 package com.katbot.events;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -19,53 +16,67 @@ public class GuildMessageListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event)
     {
-        // The user who sent the message
-        User author = event.getAuthor();
-        // This is a special class called a "union", which allows you to perform specialization to more concrete types such as TextChannel or NewsChannel
-        MessageChannelUnion channel = event.getChannel();
-        // The actual message sent by the user, this can also be a message the bot sent itself, since you *do* receive your own messages after all
-        Message message = event.getMessage();
+        if (!isMessageValid(event)) return;
+        logEvent(event);
 
-        if (author.isBot()) return;
 
-        // Check whether the message was sent in a guild / server
-        if (event.isFromGuild())
-        {
-            // This is a message from a server
-            logger.info(String.format("[%s] [%#s] %#s: %s",
-                    event.getGuild().getName(), // The name of the server the user sent the message in, this is generally referred to as "guild" in the API
-                    channel, // The %#s makes use of the channel name and displays as something like #general
-                    author,  // The %#s makes use of User#getAsTag which results in something like minn or Minn#1337
-                    message.getContentDisplay() // This removes any unwanted mention syntax and converts it to a readable string
-            ));
-        }
-        else
-        {
-            // This is a message from a private channel
-            logger.debug(String.format("[direct] %#s: %s\n",
-                    author, // same as above
-                    message.getContentDisplay()
-            ));
-        }
+        event.getChannel().sendMessage(
+                String.format("Hello! You wrote : \"%s\"", event.getMessage().getContentDisplay())
+        ).queue();
 
-        // Using specialization, you can check concrete types of the channel union
-
-        if (channel.getType() == ChannelType.TEXT  && event.getChannel().getId().equals(testingChannelID) && author.getId().equals(testingUserID))
-        {
-            event.getChannel().sendMessage(
-                    String.format("Hello! You wrote : \"%s\"", message.getContentDisplay())
-            ).queue();
-        }
-
-//        if (channel.getType().isThread())
-//        {
-//        }
     }
 
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event)
     {
 
-        System.out.println("A user reacted to a message!");
+    }
+
+    /**
+     * Checks if the received message is valid based on specific criteria.
+     * A valid message is one that comes from a text channel (not a DM or other type),
+     * is not sent by a bot, is in the specified testing channel and user,
+     * and starts with "Kat " (case-insensitive).
+     *
+     * @param event The MessageReceivedEvent to evaluate.
+     * @return true if the message is valid, false otherwise.
+     */
+    private boolean isMessageValid(MessageReceivedEvent event) {
+        if (event.getChannel().getType() != ChannelType.TEXT) {
+            return false;
+        }
+        if (event.getAuthor().isBot()) {
+            return false;
+        }
+        if (!event.getChannel().getId().equals(testingChannelID)) {
+            return false;
+        }
+        if (!event.getAuthor().getId().equals(testingUserID)) {
+            return false;
+        }
+        String message = event.getMessage().getContentDisplay().toLowerCase();
+        return message.startsWith("kat ");
+    }
+
+    /**
+     * Logs a message received event. Differentiates between messages from a guild
+     * and direct messages.
+     *
+     * @param event The MessageReceivedEvent to log.
+     */
+    private void logEvent(MessageReceivedEvent event) {
+        if (event.isFromGuild()) {
+            // Server channel
+            logger.info("[{}] [#{}] {}: {}",
+                    event.getGuild().getName(),
+                    event.getChannel().getName(),
+                    event.getAuthor().getName(),
+                    event.getMessage().getContentDisplay());
+        } else {
+            // Private channel
+            logger.debug("[direct] {}: {}",
+                    event.getAuthor().getName(),
+                    event.getMessage().getContentDisplay());
+        }
     }
 }
