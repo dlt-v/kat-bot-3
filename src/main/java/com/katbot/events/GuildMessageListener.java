@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class FirstEventListener extends ListenerAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(FirstEventListener.class);
+public class GuildMessageListener extends ListenerAdapter {
+    private static final Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
     private static final String testingChannelID = System.getenv("testing-channel-id");
     private static final String testingUserID = System.getenv("testing-user-id");
     @Override

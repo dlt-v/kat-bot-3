@@ -1,6 +1,6 @@
 package com.katbot;
 
-import com.katbot.events.FirstEventListener;
+import com.katbot.events.GuildMessageListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -27,7 +27,7 @@ public class KatBot {
         String token = System.getenv("token");
         JDABuilder builder = JDABuilder.createDefault(token, intents);
         builder.setActivity(Activity.watching("Netflix"));
-        builder.addEventListeners(new FirstEventListener());
+        builder.addEventListeners(new GuildMessageListener());
         JDA jda = builder.build();
     }
 }
