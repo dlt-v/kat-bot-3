@@ -44,10 +44,17 @@ public class RollCommand implements Command {
                 rollResults = String.valueOf(totalSum);
             }
 
-            String response = String.format("<@%s> rolled %s", event.getAuthor().getId(), rollResults);
+            String response = String.format("<@%s> rolled %s.", event.getAuthor().getId(), rollResults);
             event.getChannel().sendMessage(response).queue();
         } else {
-            event.getChannel().sendMessage("Invalid roll command. Use the format '/kat roll [NdM] [+X]' where N is the number of dice, M is the number of sides per die, and X is an optional modifier.").queue();
+            event.getChannel().sendMessage("""
+                    **Invalid roll command.**
+                    Use the format 'kat roll xdy +z'
+                    where x is the number of dice,
+                    y is the number of sides per die,
+                    and z is an optional modifier.
+                    Example: `kat roll 2d6 +4`
+                    """).queue();
         }
     }
 
