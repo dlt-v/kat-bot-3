@@ -27,7 +27,6 @@ public class RollCommandTest {
     private User mockUser;
     @Mock
     private Message mockMessage;
-
     @Mock
     private MessageCreateAction mockMessageAction;
 
@@ -39,7 +38,7 @@ public class RollCommandTest {
         // Instantiate the object to test
         rollCommand = new RollCommand();
 
-        // Configure the mocks to return expected values
+        // Configure the mock objects to return expected values
         when(mockEvent.getChannel()).thenReturn(mockChannel);
         when(mockEvent.getAuthor()).thenReturn(mockUser);
         when(mockEvent.getMessage()).thenReturn(mockMessage);
@@ -68,17 +67,13 @@ public class RollCommandTest {
 
     @Test
     public void testRollSingleDie() {
-        // Simulate command to roll one twelve-sided die
         when(mockMessage.getContentDisplay()).thenReturn("kat roll d12");
 
-        // Execute the command
         rollCommand.execute(mockEvent, new String[]{"d12"});
 
-        // Capture the message sent to the channel
         ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
         verify(mockChannel).sendMessage(messageCaptor.capture());
 
-        // Assert the message matches the expected pattern
         String responseMessage = messageCaptor.getValue();
         assertTrue(responseMessage.matches("<@1234> rolled \\d{1,2}"),
                 "Response should match the pattern and be a number between 1 and 12.");
@@ -103,17 +98,13 @@ public class RollCommandTest {
 
     @Test
     public void testRollMultipleDiceWithModifier() {
-        // Simulate command to roll two two-sided dice and add a modifier of 4
         when(mockMessage.getContentDisplay()).thenReturn("/kat roll 2d2 +4");
 
-        // Execute the command
         rollCommand.execute(mockEvent, new String[]{"2d2", "+4"});
 
-        // Capture the message sent to the channel
         ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
         verify(mockChannel).sendMessage(messageCaptor.capture());
 
-        // Assert the message matches the expected pattern
         String responseMessage = messageCaptor.getValue();
         assertTrue(responseMessage.matches("<@1234> rolled \\d \\+ \\d \\+ 4 = \\d{1,2}"),
                 "Response should match the pattern and be a sum of the two dice rolls plus the modifier.");
@@ -121,17 +112,13 @@ public class RollCommandTest {
 
     @Test
     public void testRollMultipleDice() {
-        // Simulate command to roll two two-sided dice
         when(mockMessage.getContentDisplay()).thenReturn("/kat roll 2d2");
 
-        // Execute the command
         rollCommand.execute(mockEvent, new String[]{"2d2"});
 
-        // Capture the message sent to the channel
         ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
         verify(mockChannel).sendMessage(messageCaptor.capture());
 
-        // Assert the message matches the expected pattern
         String responseMessage = messageCaptor.getValue();
         assertTrue(responseMessage.matches("<@1234> rolled \\d \\+ \\d = \\d{1,2}"),
                 "Response should match the pattern and be a sum of the two dice rolls.");
