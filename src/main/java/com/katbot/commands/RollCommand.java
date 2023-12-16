@@ -15,36 +15,36 @@ public class RollCommand implements Command {
     public void execute(MessageReceivedEvent event, String[] args) {
         // Default roll is 1d6
         String input = args.length > 0 ? String.join(" ", args).toLowerCase() : "1d6";
-        int numberOfDice, sides, modifier = 0;
 
-        // Regex to match various dice roll commands
-        Pattern pattern = Pattern.compile("(?:(\\d*)d(\\d+))(?:\\s*\\+\\s*(\\d+))?");
+        // Regex to match dice roll commands
+        Pattern pattern = Pattern.compile("(\\d*)d(\\d+)(?:\\s*\\+\\s*(\\d+))?");
         Matcher matcher = pattern.matcher(input);
 
         if (matcher.matches()) {
-            // Default to 1 die if no number is specified before 'd'
-            numberOfDice = matcher.group(1) != null && !matcher.group(1).isEmpty() ? Integer.parseInt(matcher.group(1)) : 1;
-            sides = Integer.parseInt(matcher.group(2));
-            // Check for modifier, if present
+            int numberOfDice = matcher.group(1) != null && !matcher.group(1).isEmpty() ? Integer.parseInt(matcher.group(1)) : 1;
+            int sides = Integer.parseInt(matcher.group(2));
+            int modifier = 0;
+
             if (matcher.group(3) != null && !matcher.group(3).isEmpty()) {
                 modifier = Integer.parseInt(matcher.group(3));
             }
 
-            // Roll the dice
             List<Integer> rolls = rollDice(numberOfDice, sides);
             int rollSum = rolls.stream().mapToInt(Integer::intValue).sum();
             int totalSum = rollSum + modifier;
 
-            // Build the roll result string
-            String rollResults = rolls.stream().map(String::valueOf).collect(Collectors.joining(" + "));
+            String rollResults;
+            if (numberOfDice > 1 || modifier > 0) {
+                rollResults = rolls.stream().map(String::valueOf).collect(Collectors.joining(" + "));
+                if (modifier > 0) {
+                    rollResults += " + " + modifier;
+                }
+                rollResults += " = " + totalSum;
+            } else {
+                rollResults = String.valueOf(totalSum);
+            }
 
-            // Format the response string based on whether we rolled more than one die
-            String response = numberOfDice > 1 ?
-                    String.format("<@%s> rolled %s = %d", event.getAuthor().getId(), rollResults, totalSum) :
-                    modifier > 0 ?
-                            String.format("<@%s> rolled %s + %d = %d", event.getAuthor().getId(), rollResults, modifier, totalSum) :
-                            String.format("<@%s> rolled %d", event.getAuthor().getId(), totalSum);
-
+            String response = String.format("<@%s> rolled %s", event.getAuthor().getId(), rollResults);
             event.getChannel().sendMessage(response).queue();
         } else {
             event.getChannel().sendMessage("Invalid roll command. Use the format '/kat roll [NdM] [+X]' where N is the number of dice, M is the number of sides per die, and X is an optional modifier.").queue();
