@@ -1,8 +1,8 @@
 package com.katbot.events;
 
+import com.katbot.commands.CommandHandler;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -13,24 +13,22 @@ public class GuildMessageListener extends ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
     private static final String testingChannelID = System.getenv("testing-channel-id");
     private static final String testingUserID = System.getenv("testing-user-id");
+
+    private final CommandHandler commandHandler = new CommandHandler();
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event)
     {
         if (!isMessageValid(event)) return;
         logEvent(event);
 
+        commandHandler.handle(event);
 
-        event.getChannel().sendMessage(
-                String.format("Hello! You wrote : \"%s\"", event.getMessage().getContentDisplay())
-        ).queue();
-
-    }
-
-    @Override
-    public void onMessageReactionAdd(MessageReactionAddEvent event)
-    {
+//        event.getChannel().sendMessage(
+//                String.format("Hello! You wrote : \"%s\"", event.getMessage().getContentDisplay())
+//        ).queue();
 
     }
+
 
     /**
      * Checks if the received message is valid based on specific criteria.
