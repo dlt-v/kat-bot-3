@@ -12,6 +12,7 @@ public class CommandHandler {
     public CommandHandler() {
         this.commandMap = new HashMap<>();
         commandMap.put("roll", new RollCommand());
+        commandMap.put("zabawa", new ZabawaCommand());
     }
 
     public void handle(MessageReceivedEvent event) {

@@ -62,7 +62,7 @@ public class RollCommandTest {
 
         // Assert the message matches the expected pattern
         String responseMessage = messageCaptor.getValue();
-        assertTrue(responseMessage.matches("<@1234> rolled \\d"), "Response should match the pattern.");
+        assertTrue(responseMessage.matches("<@1234> rolled \\d."), "Response should match the pattern but it returns: " + responseMessage);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class RollCommandTest {
         verify(mockChannel).sendMessage(messageCaptor.capture());
 
         String responseMessage = messageCaptor.getValue();
-        assertTrue(responseMessage.matches("<@1234> rolled \\d{1,2}"),
+        assertTrue(responseMessage.matches("<@1234> rolled \\d{1,2}."),
                 "Response should match the pattern and be a number between 1 and 12.");
     }
 
@@ -92,7 +92,7 @@ public class RollCommandTest {
         verify(mockChannel).sendMessage(messageCaptor.capture());
 
         String responseMessage = messageCaptor.getValue();
-        assertTrue(responseMessage.matches("<@1234> rolled \\d \\+ 4 = \\d{1,2}"),
+        assertTrue(responseMessage.matches("<@1234> rolled \\d \\+ 4 = \\d{1,2}."),
                 "Response should match the pattern and be the result of the die roll plus the modifier.");
     }
 
@@ -106,7 +106,7 @@ public class RollCommandTest {
         verify(mockChannel).sendMessage(messageCaptor.capture());
 
         String responseMessage = messageCaptor.getValue();
-        assertTrue(responseMessage.matches("<@1234> rolled \\d \\+ \\d \\+ 4 = \\d{1,2}"),
+        assertTrue(responseMessage.matches("<@1234> rolled \\d \\+ \\d \\+ 4 = \\d{1,2}."),
                 "Response should match the pattern and be a sum of the two dice rolls plus the modifier.");
     }
 
@@ -120,7 +120,7 @@ public class RollCommandTest {
         verify(mockChannel).sendMessage(messageCaptor.capture());
 
         String responseMessage = messageCaptor.getValue();
-        assertTrue(responseMessage.matches("<@1234> rolled \\d \\+ \\d = \\d{1,2}"),
+        assertTrue(responseMessage.matches("<@1234> rolled \\d \\+ \\d = \\d{1,2}."),
                 "Response should match the pattern and be a sum of the two dice rolls.");
     }
 }
