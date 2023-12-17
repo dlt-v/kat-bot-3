@@ -13,6 +13,7 @@ public class CommandHandler {
         this.commandMap = new HashMap<>();
         commandMap.put("roll", new RollCommand());
         commandMap.put("zabawa", new ZabawaCommand());
+        commandMap.put("poll", new PollCommand());
     }
 
     public void handle(MessageReceivedEvent event) {

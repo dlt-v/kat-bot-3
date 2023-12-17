@@ -22,11 +22,6 @@ public class GuildMessageListener extends ListenerAdapter {
         logEvent(event);
 
         commandHandler.handle(event);
-
-//        event.getChannel().sendMessage(
-//                String.format("Hello! You wrote : \"%s\"", event.getMessage().getContentDisplay())
-//        ).queue();
-
     }
 
 
