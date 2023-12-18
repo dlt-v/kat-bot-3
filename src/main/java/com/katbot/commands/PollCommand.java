@@ -6,34 +6,66 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PollCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
-        if (args.length < 2) {
-            event.getChannel().sendMessage("Usage: kat poll <question> <answer1> <answer2>").queue();
+
+        List<String> arguments = parseArguments(String.join(" ", args));
+
+        if (arguments.size() < 2) {
+            event.getChannel().sendMessage("Usage: kat poll <question> <answer1> <answer2> ... <answer 5>").queue();
+            return;
+        }
+
+        if (arguments.size() > 5) {
+            event.getChannel().sendMessage("Too many possible answers. Maximum is 5. You provided: " + (arguments.size()- 1)).queue();
             return;
         }
 
         ArrayList<Button> buttons = new ArrayList<>();
 
-
-        for (int i = 1; i < args.length; i++) {
-            buttons.add(Button.primary(i + "", args[i]));
-            // TODO: There can be max 5 buttons on one embed/message.
-        }
-
-
         EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setTitle("Test Embed");
-        embedBuilder.setDescription("Description");
+        embedBuilder.setTitle("Poll: " + capitalizeString(arguments.get(0)));
         embedBuilder.setColor(0x00FF00);
 
-        embedBuilder.addField("Field 1", "Value 1", false);
-        embedBuilder.addField("Field 2", "Value 2", true);
+        for (int i = 1; i < arguments.size(); i++) {
+            buttons.add(Button.primary(i + "", capitalizeString(arguments.get(i))));
+            embedBuilder.addField(capitalizeString(arguments.get(i)), String.valueOf(0), false);
+        }
 
         MessageEmbed embed = embedBuilder.build();
 
         event.getChannel().sendMessageEmbeds(embed).setActionRow(buttons).queue();
+    }
+
+    private List<String> parseArguments(String input) {
+        ArrayList<String> arguments = new ArrayList<>();
+        Matcher matcher = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(input);
+        while (matcher.find()) {
+            arguments.add(matcher.group(1).replace("\"", ""));
+        }
+        return arguments;
+    }
+
+    private String capitalizeString(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        char firstChar = input.charAt(0);
+        if (Character.isLowerCase(firstChar)) {
+            input = Character.toUpperCase(firstChar) + input.substring(1);
+        }
+
+        char lastChar = input.charAt(input.length() - 1);
+        if (lastChar != '.' && lastChar != '?' && lastChar != '!') {
+            input += '.';
+        }
+
+        return input;
     }
 }
