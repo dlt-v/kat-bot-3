@@ -30,10 +30,11 @@ public class PollCommand implements Command {
 
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("Poll: " + capitalizeString(arguments.get(0)));
+        embedBuilder.setDescription("Created by <@%s>".formatted(event.getAuthor().getId()));
         embedBuilder.setColor(0x00FF00);
 
         for (int i = 1; i < arguments.size(); i++) {
-            buttons.add(Button.primary(i + "", capitalizeString(arguments.get(i))));
+            buttons.add(Button.primary(capitalizeString(arguments.get(i)), capitalizeString(arguments.get(i))));
             embedBuilder.addField(capitalizeString(arguments.get(i)), String.valueOf(0), false);
         }
 
