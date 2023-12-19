@@ -24,9 +24,16 @@ public class ButtonInteractionListener extends ListenerAdapter {
         logger.info("Button \"" + event.getButton().getLabel() + "\" (id:" + event.getButton().getId() + ") was reacted with.");
         event.reply("You chose: \"" + event.getButton().getLabel() + "\"").setEphemeral(true).queue();
 
-
         MessageEmbed oldEmbed = event.getMessage().getEmbeds().get(0);
 
+        MessageEmbed newEmbed = buildNewEmbed(event, oldEmbed);
+        List<MessageEmbed> embeds = new ArrayList<>();
+        embeds.add(newEmbed);
+        event.getMessage().editMessageEmbeds(embeds).queue();
+    }
+
+    @NotNull
+    private static MessageEmbed buildNewEmbed(@NotNull ButtonInteractionEvent event, MessageEmbed oldEmbed) {
         EmbedBuilder newEmbedBuilder = new EmbedBuilder();
         newEmbedBuilder.setTitle(oldEmbed.getTitle());
         newEmbedBuilder.setDescription(oldEmbed.getDescription());
@@ -37,11 +44,9 @@ public class ButtonInteractionListener extends ListenerAdapter {
             int value = Integer.parseInt(field.getValue());
             if (field.getName().equals(event.getButton().getLabel())) value++;
             newEmbedBuilder.addField(field.getName(), String.valueOf(value), false);
-        }
-        List<MessageEmbed> embeds = new ArrayList<>();
-        embeds.add(newEmbedBuilder.build());
-        event.getMessage().editMessageEmbeds(embeds).queue();
 
+        }
+        return newEmbedBuilder.build();
     }
 }
 
