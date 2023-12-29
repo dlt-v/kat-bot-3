@@ -1,5 +1,6 @@
-package com.katbot.commands;
+package com.katbot.commands.Roll;
 
+import com.katbot.commands.Command;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;

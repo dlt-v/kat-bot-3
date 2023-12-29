@@ -44,7 +44,6 @@ public class ButtonInteractionListener extends ListenerAdapter {
             int value = Integer.parseInt(field.getValue());
             if (field.getName().equals(event.getButton().getLabel())) value++;
             newEmbedBuilder.addField(field.getName(), String.valueOf(value), false);
-
         }
         return newEmbedBuilder.build();
     }

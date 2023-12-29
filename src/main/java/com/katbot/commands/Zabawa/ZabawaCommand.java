@@ -1,5 +1,6 @@
-package com.katbot.commands;
+package com.katbot.commands.Zabawa;
 
+import com.katbot.commands.Command;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ZabawaCommand implements Command {

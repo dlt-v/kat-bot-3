@@ -1,5 +1,6 @@
-package com.katbot.commands;
+package com.katbot.commands.Poll;
 
+import com.katbot.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

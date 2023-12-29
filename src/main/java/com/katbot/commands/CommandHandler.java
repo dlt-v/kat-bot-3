@@ -1,5 +1,8 @@
 package com.katbot.commands;
 
+import com.katbot.commands.Poll.PollCommand;
+import com.katbot.commands.Roll.RollCommand;
+import com.katbot.commands.Zabawa.ZabawaCommand;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
