@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PollCommand implements Command {
+
+    private final static PollManager pollManager = new PollManager();
+    private final static Logger logger = LoggerFactory.getLogger(PollCommand.class);
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
 
@@ -41,7 +46,11 @@ public class PollCommand implements Command {
 
         MessageEmbed embed = embedBuilder.build();
 
-        event.getChannel().sendMessageEmbeds(embed).setActionRow(buttons).queue();
+        event.getChannel().sendMessageEmbeds(embed).setActionRow(buttons).queue(message -> {
+            Poll poll = new Poll(message.getIdLong());
+            pollManager.addPoll(poll);
+            logger.info("Poll created with ID: " + poll.getId());
+        });
     }
 
     private List<String> parseArguments(String input) {

@@ -21,7 +21,7 @@ public class ButtonInteractionListener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event)
     {
 
-        logger.info("Button \"" + event.getButton().getLabel() + "\" (id:" + event.getButton().getId() + ") was reacted with.");
+        logger.info("Button \"" + event.getButton().getLabel() + "\" (Button id:" + event.getButton().getId() + ", Message id: "+ event.getMessage().getId()+") was reacted with.");
         event.reply("You chose: \"" + event.getButton().getLabel() + "\"").setEphemeral(true).queue();
 
         MessageEmbed oldEmbed = event.getMessage().getEmbeds().get(0);
