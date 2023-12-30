@@ -25,7 +25,11 @@ public class KatBot {
                 GatewayIntent.DIRECT_MESSAGE_REACTIONS
         );
 
+
         String token = System.getenv("token");
+        if (token == null) {
+            throw new IllegalStateException("Discord bot token not found. Make sure the 'token' environment variable is set.");
+        }
         JDABuilder builder = JDABuilder.createDefault(token, intents);
         builder.setActivity(Activity.watching("Netflix"));
         builder.addEventListeners(new GuildMessageListener());

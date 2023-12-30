@@ -1,5 +1,4 @@
 FROM openjdk:17
-LABEL authors="tmmmi"
-COPY target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+WORKDIR /usr/src/app
+COPY ./target/kat-bot-3-1.0-SNAPSHOT.jar /usr/src/app
+ENTRYPOINT ["java", "-jar", "kat-bot-3-1.0-SNAPSHOT.jar"]
