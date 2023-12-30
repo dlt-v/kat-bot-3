@@ -1,4 +1,5 @@
 FROM openjdk:17
 LABEL authors="tmmmi"
-COPY target/kat-bot.jar app.jar
+COPY target/*.jar app.jar
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
