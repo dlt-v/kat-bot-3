@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class PollCommand implements Command {
 
-    private final static PollManager pollManager = new PollManager();
+    private final static PollManager pollManager = PollManager.getInstance();
     private final static Logger logger = LoggerFactory.getLogger(PollCommand.class);
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {

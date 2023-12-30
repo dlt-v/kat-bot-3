@@ -8,10 +8,23 @@ public class Poll {
 
     public Poll(long id) {
         this.id = id;
+        votes = new ArrayList<>();
     }
 
     public void addVote(Vote vote) {
         votes.add(vote);
+    }
+
+    public boolean containsVote(long userId) {
+        if (votes == null) {
+            return false;
+        }
+        for (Vote vote : votes) {
+            if (vote.userId() == userId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
