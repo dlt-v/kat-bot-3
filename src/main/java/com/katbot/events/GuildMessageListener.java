@@ -13,6 +13,7 @@ public class GuildMessageListener extends ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
     private static final String testingChannelID = System.getenv("testing-channel-id");
     private static final String testingUserID = System.getenv("testing-user-id");
+    private static final String environmentType = System.getenv("environment");
 
     private final CommandHandler commandHandler = new CommandHandler();
     @Override
@@ -41,12 +42,12 @@ public class GuildMessageListener extends ListenerAdapter {
         if (event.getAuthor().isBot()) {
             return false;
         }
-        if (!event.getChannel().getId().equals(testingChannelID)) {
+        if ("testing".equals(environmentType) &&
+            !(event.getChannel().getId().equals(testingChannelID) &&
+            event.getAuthor().getId().equals(testingUserID))) {
             return false;
         }
-        if (!event.getAuthor().getId().equals(testingUserID)) {
-            return false;
-        }
+
         String message = event.getMessage().getContentDisplay().toLowerCase();
         return message.startsWith("kat ");
     }
