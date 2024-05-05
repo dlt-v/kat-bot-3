@@ -1,5 +1,6 @@
 package com.katbot.commands;
 
+import com.katbot.commands.MinecraftStatus.MinecraftStatusCommand;
 import com.katbot.commands.Poll.PollCommand;
 import com.katbot.commands.Roll.RollCommand;
 import com.katbot.commands.Zabawa.ZabawaCommand;
@@ -17,6 +18,7 @@ public class CommandHandler {
         commandMap.put("roll", new RollCommand());
         commandMap.put("zabawa", new ZabawaCommand());
         commandMap.put("poll", new PollCommand());
+        commandMap.put("mc-status", new MinecraftStatusCommand());
     }
 
     public void handle(MessageReceivedEvent event) {
