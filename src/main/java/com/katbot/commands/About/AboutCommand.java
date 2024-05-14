@@ -13,7 +13,12 @@ public class AboutCommand implements com.katbot.commands.Command {
         jda.retrieveUserById(System.getenv("testing-user-id")).queue(user -> {
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder.setTitle("About KatBot");
-            embedBuilder.setDescription("I'm KatBot, a personalised Discord bot for shits and giggles and a few useful things. :)");
+            embedBuilder.setDescription(
+                    "KatBot is a personalised Discord bot created for shits and giggles *but* also has a few useful things!" +
+                    "\n\nI'm currently in development, so expect some bugs and missing features." +
+                    "If you have any suggestions or feedback, feel free to contact the author.\n\n" +
+                    "Use `kat help` to see available commands!\n\n" +
+                    "Version: `"+ System.getenv("version") + "`");
             embedBuilder.setColor(0xFFFF00);
             embedBuilder.setFooter("Created by delta.v", user.getAvatarUrl());
             event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
