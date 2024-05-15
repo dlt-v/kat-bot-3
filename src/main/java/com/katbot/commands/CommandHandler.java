@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CommandHandler {
@@ -16,11 +17,18 @@ public class CommandHandler {
 
     public CommandHandler() {
         this.commandMap = new HashMap<>();
-        commandMap.put("roll", new RollCommand());
-        commandMap.put("zabawa", new ZabawaCommand());
-        commandMap.put("poll", new PollCommand());
-        commandMap.put("mc-status", new MinecraftStatusCommand());
-        commandMap.put("about", new AboutCommand());
+
+        registerCommand(new RollCommand(), Arrays.asList("roll", "dice"));
+        registerCommand(new ZabawaCommand(), Arrays.asList("zabawa", "fun"));
+        registerCommand(new PollCommand(), Arrays.asList("poll", "vote"));
+        registerCommand(new MinecraftStatusCommand(), Arrays.asList("mc-status", "minecraft"));
+        registerCommand(new AboutCommand(), Arrays.asList("about", "info"));
+    }
+
+    private void registerCommand(Command command, List<String> aliases) {
+        for (String alias : aliases) {
+            commandMap.put(alias, command);
+        }
     }
 
     public void handle(MessageReceivedEvent event) {
