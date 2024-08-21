@@ -11,14 +11,20 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class MinecraftStatusCommand implements Command {
     private static final Logger LOGGER = LoggerFactory.getLogger(MinecraftStatusCommand.class);
     private static final String host = System.getenv("mc-server-address");
+    public static final int PORT = 25565;
 
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
         MinecraftProtocol protocol = new MinecraftProtocol();
-        TcpClientSession session = new TcpClientSession(host, 25565, protocol);
+        TcpClientSession session = new TcpClientSession(host, PORT, protocol);
 
         try {
             session.setFlag(MinecraftConstants.SERVER_INFO_HANDLER_KEY, (ServerInfoHandler) (session1, serverStatusInfo) -> {
@@ -46,7 +52,22 @@ public class MinecraftStatusCommand implements Command {
                 session1.disconnect("Finished");
 
             });
-            session.connect(true);
+            session.setConnectTimeout(5000);
+            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+            Future<?> future = executor.submit(() -> {
+                try {
+                    session.connect(false);
+                } catch (Exception e) {
+                    event.getChannel().sendMessage("An error occurred while trying to connect to the server!").queue();
+                    LOGGER.error("An error occurred while trying to connect to the server!", e);
+                }
+            });
+            executor.schedule(() -> {
+                future.cancel(true);
+            }, 5, TimeUnit.SECONDS); // 5 seconds timeout for the connection attempt
+
+            future.get(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             event.getChannel().sendMessage("An error occurred while trying to connect to the server!").queue();
             LOGGER.error("An error occurred while trying to connect to the server!", e);

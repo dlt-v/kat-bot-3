@@ -20,7 +20,7 @@ public class ButtonInteractionListener extends ListenerAdapter {
     private static final String testingChannelID = System.getenv("testing-channel-id");
     private static final String testingUserID = System.getenv("testing-user-id");
 
-    private PollManager pollManager = PollManager.getInstance();
+    private final PollManager pollManager = PollManager.getInstance();
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event)
