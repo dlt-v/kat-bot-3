@@ -2,6 +2,7 @@ package com.katbot.commands;
 
 import com.katbot.commands.About.AboutCommand;
 import com.katbot.commands.EightBall.EightBallCommand;
+import com.katbot.commands.Help.HelpCommand;
 import com.katbot.commands.MinecraftStatus.MinecraftStatusCommand;
 import com.katbot.commands.Poll.PollCommand;
 import com.katbot.commands.Roll.RollCommand;
@@ -24,6 +25,7 @@ public class CommandHandler {
         registerCommand(new PollCommand(), Arrays.asList("poll", "vote"));
         registerCommand(new MinecraftStatusCommand(), Arrays.asList("mc-status", "minecraft"));
         registerCommand(new AboutCommand(), Arrays.asList("about", "info"));
+        registerCommand(new HelpCommand(), Arrays.asList("help", "commands"));
         registerCommand(new EightBallCommand(), Arrays.asList(
                 "will", "is", "does", "can", "should", "has", "was", "might", "would", "could", "are",
                 "do", "did", "have", "hasn't", "aren't", "wasn't", "wouldn't", "couldn't", "won't",
