@@ -20,15 +20,14 @@ public class HelpCommand implements Command {
             if (args.length == 0) {
                 embedBuilder = buildDefaultCommand(user);
             } else {
-                embedBuilder = buildSpecificCommand(user, argument);
+                embedBuilder = buildSpecificCommand(argument);
             }
-            // send as a reply
-//            event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
+//
             event.getMessage().replyEmbeds(embedBuilder.build()).queue();
         });
     }
 
-    private EmbedBuilder buildSpecificCommand(User user, String argument) {
+    private EmbedBuilder buildSpecificCommand(String argument) {
         EmbedBuilder resultEmbed = new EmbedBuilder();
 
         switch(argument) {
