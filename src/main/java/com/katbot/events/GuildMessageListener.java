@@ -1,8 +1,10 @@
 package com.katbot.events;
 
 import com.katbot.commands.CommandHandler;
+import com.katbot.commands.TwitterLinkHandler;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -16,9 +18,27 @@ public class GuildMessageListener extends ListenerAdapter {
     private static final String environmentType = System.getenv("environment");
 
     private final CommandHandler commandHandler = new CommandHandler();
+
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event)
     {
+        if (isMessageTwitterLink(event)) {
+            String twitterLink = event.getMessage().getContentDisplay().toLowerCase();
+            StringBuilder sb = new StringBuilder();
+            sb.append("Raw x.com links don't embed properly! Use vxtwitter.com instead!");
+            sb.append("\n\n");
+            sb.append(TwitterLinkHandler.convertTwitterLink(twitterLink));
+            try {
+                event.getMessage().suppressEmbeds(true).queue();
+
+            } catch (InsufficientPermissionException e) {
+                sb.append("\n");
+                sb.append("I don't have permission to suppress embeds of the original message. **Please contact the server owner.**");
+                logger.error("Error suppressing embeds", e);
+            }
+            event.getMessage().reply(sb.toString()).queue();
+            return;
+        }
         if (!isMessageValid(event)) return;
         logEvent(event);
 
@@ -50,6 +70,10 @@ public class GuildMessageListener extends ListenerAdapter {
 
         String message = event.getMessage().getContentDisplay().toLowerCase();
         return message.startsWith("kat ");
+    }
+
+    private boolean isMessageTwitterLink(MessageReceivedEvent event) {
+        return event.getMessage().getContentDisplay().toLowerCase().startsWith("https://x.com/");
     }
 
     /**
