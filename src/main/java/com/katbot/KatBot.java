@@ -1,7 +1,7 @@
 package com.katbot;
 
-import com.katbot.events.ButtonInteractionListener;
-import com.katbot.events.GuildMessageListener;
+import com.katbot.listeners.ButtonInteractionListener;
+import com.katbot.listeners.GuildMessageListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;

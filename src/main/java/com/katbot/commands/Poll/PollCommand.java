@@ -49,7 +49,7 @@ public class PollCommand implements Command {
         event.getChannel().sendMessageEmbeds(embed).setActionRow(buttons).queue(message -> {
             Poll poll = new Poll(message.getIdLong());
             pollManager.addPoll(poll);
-            logger.info("Poll created with ID: " + poll.getId());
+            logger.info("Poll created with ID: {}", poll.getId());
         });
     }
 
