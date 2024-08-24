@@ -35,7 +35,7 @@ public class PollManager {
             return false;
         }
         if (poll.containsVote(vote.userId())) {
-            logger.error("Vote was not added. User with id: " + vote.userId() + " already voted in this poll.");
+            logger.error("Vote was not added. User with id: {} already voted in this poll.", vote.userId());
             return false;
         }
         poll.addVote(vote);

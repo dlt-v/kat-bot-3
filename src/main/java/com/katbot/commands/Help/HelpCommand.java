@@ -22,62 +22,98 @@ public class HelpCommand implements Command {
             } else {
                 embedBuilder = buildSpecificCommand(argument);
             }
-//
             event.getMessage().replyEmbeds(embedBuilder.build()).queue();
         });
     }
 
     private EmbedBuilder buildSpecificCommand(String argument) {
         EmbedBuilder resultEmbed = new EmbedBuilder();
+        String title;
+        StringBuilder description = new StringBuilder();
+        int color = 0x00FF00;
 
-        switch(argument) {
+        switch (argument) {
             case "roll":
-                resultEmbed.setTitle("Roll Command");
-                resultEmbed.setDescription("The `kat roll` command allows you to roll a dice. " +
-                        "\nThe command will generate a random number between 1 and 6.");
-                resultEmbed.setColor(0x00FF00);
-                return resultEmbed;
+                title = "Roll Command";
+                description.append("The `kat roll` command allows you to simulate rolling dice. ")
+                        .append("You can roll a single die or multiple dice with customizable sides and optional modifiers.\n\n")
+                        .append("**Usage Examples:**\n")
+                        .append("• `kat roll` - Rolls a single 6-sided die (default behavior, equivalent to `kat roll 1d6`).\n")
+                        .append("• `kat roll 2d6` - Rolls two 6-sided dice and sums the result.\n")
+                        .append("• `kat roll 3d8 +2` - Rolls three 8-sided dice, sums the result, and adds a modifier of +2.\n\n")
+                        .append("**Syntax:**\n")
+                        .append("• `kat roll xdy +z`\n")
+                        .append("Where:\n")
+                        .append("  - `x` is the number of dice to roll (optional, defaults to 1).\n")
+                        .append("  - `y` is the number of sides per die.\n")
+                        .append("  - `+z` is an optional modifier added to the final result.");
+                break;
             case "zabawa":
-                resultEmbed.setTitle("Zabawa Command");
-                resultEmbed.setDescription("The `kat zabawa` command gives zabawa. ");
-                resultEmbed.setColor(0x00FF00);
-                return resultEmbed;
+                title = "Zabawa Command";
+                description.append("The `kat zabawa` command gives zabawa. ");
+                break;
             case "poll":
-                resultEmbed.setTitle("Poll Command");
-                StringBuilder pollDescription = new StringBuilder("The `kat poll` command allows you to create a poll.");
-                pollDescription.append("\nUsage: `kat poll <question> <answer1> <answer2> ... <answer5>`");
-                pollDescription.append("\nExample: `kat poll \"What day?\" Monday Tuesday Wednesday \"I don't know\"`");
-                pollDescription.append("\n(I guess kind of useless know since Discord added their own polls but oh well!");
-                resultEmbed.setDescription(pollDescription);
-                resultEmbed.setColor(0x00FF00);
-                return resultEmbed;
+                title = "Poll Command";
+                description.append("The `kat poll` command allows you to create a custom poll with up to 5 possible answers. ")
+                        .append("Users can vote on the options via buttons.\n\n")
+                        .append("**Usage:**\n")
+                        .append("`kat poll <question> <answer1> <answer2> ... <answer5>`\n\n")
+                        .append("**Examples:**\n")
+                        .append("• `kat poll \"What's your favorite color?\" Red Blue Green`\n")
+                        .append("• `kat poll \"Which day works best?\" Monday Tuesday Wednesday \"I don't know\"`\n\n")
+                        .append("You can provide between 2 and 5 answers. The question and answers can be in quotes if they contain spaces.\n\n")
+                        .append("Once the poll is created, users can vote by clicking on the buttons provided with the answers.\n\n")
+                        .append("**Note**: Poll command is no longer maintained since Discord's own poll feature is available.");
+                break;
             case "mc-status":
-                resultEmbed.setTitle("Minecraft Status Command");
-                resultEmbed.setDescription("The `kat mc-status` or `kat minecraft` command allows you to check the status of a Minecraft server.");
-                resultEmbed.setColor(0x00FF00);
-                return resultEmbed;
+            case "minecraft":
+                title = "Minecraft Status Command";
+                description.append("The `kat minecraft` or `kat mc-status` command allows you to check the status of a Minecraft server. ")
+                        .append("It connects to specific server and retrieves information such as the version, current player count, and the names of online players.\n\n")
+                        .append("**Usage:**\n")
+                        .append("• `kat mc-status` or `kat minecraft` - Fetches and displays the current status of the configured Minecraft server.\n\n")
+                        .append("**Examples:**\n")
+                        .append("• `kat mc-status` - Shows the Minecraft server status, including online players and version info.\n")
+                        .append("• `kat minecraft` - Same as above; an alias for the `mc-status` command.\n\n")
+                        .append("The bot will attempt to connect to the server and provide you with details about its current state.\n")
+                        .append("If the server is unreachable or there is a connection issue, the command will time-out.");
+                break;
             case "about":
-                resultEmbed.setTitle("About Command");
-                resultEmbed.setDescription("The `kat about` command gives information about KatBot.");
-                resultEmbed.setColor(0x00FF00);
-                return resultEmbed;
+                title = "About Command";
+                description.append("The `kat about` command gives information about KatBot.");
+                break;
             case "help":
-                resultEmbed.setTitle("Help Command");
-                resultEmbed.setDescription("The `kat help` command shows the available commands for KatBot.");
-                resultEmbed.setColor(0x00FF00);
-                return resultEmbed;
+                title = "Help Command";
+                description.append("The `kat help` command provides information about the available commands for KatBot. ")
+                        .append("You can use this command to get an overview of all commands or to learn more about a specific command.\n\n")
+                        .append("**Usage:**\n")
+                        .append("• `kat help` - Displays a list of all available commands.\n")
+                        .append("• `kat help <command>` - Displays detailed information about a specific command.\n\n")
+                        .append("**Examples:**\n")
+                        .append("• `kat help` - Shows all commands.\n")
+                        .append("• `kat help roll` - Shows details and usage examples for the `kat roll` command.");
+                break;
             case "8ball":
-                resultEmbed.setTitle("8ball Command");
-                resultEmbed.setDescription("The `kat 8ball` command allows you to ask the magic 8-ball a question. Answers yes or no questions.");
-                resultEmbed.setColor(0x00FF00);
-                return resultEmbed;
+                title = "8ball Command";
+                description.append("The `kat 8ball` command allows you to ask a yes/no question to the magic 8-ball. ")
+                        .append("The bot will provide a random answer to your question, similar to the classic magic 8-ball toy.\n\n")
+                        .append("**Usage:**\n")
+                        .append("• `kat <question>` - Ask the magic 8-ball a yes/no question. The question should typically start with a word like 'will', 'is', 'does', etc.\n\n")
+                        .append("**Examples:**\n")
+                        .append("• `kat will I pass my exam?`\n")
+                        .append("• `kat is it going to rain tomorrow?`\n\n")
+                        .append("The 8-ball will provide one of many possible responses, ranging from certain to doubtful.");
+                break;
             default:
-                resultEmbed.setTitle("Unknown command");
-                resultEmbed.setDescription("The command you are looking for does not exist. " +
-                        "\nPlease use `kat help` to see the available commands.");
-                resultEmbed.setColor(0xFF0000);
-                return resultEmbed;
+                title = "Unknown command";
+                description.append("The command you are looking for does not exist.\n\n")
+                        .append("Please use `kat help` to see the available commands.");
+                color = 0xFF0000;
         }
+        resultEmbed.setTitle(title);
+        resultEmbed.setDescription(description);
+        resultEmbed.setColor(color);
+        return resultEmbed;
     }
 
     private static @NotNull EmbedBuilder buildDefaultCommand(User user) {
@@ -94,7 +130,6 @@ public class HelpCommand implements Command {
                         `kat about` - About KatBot
                         `kat help` - Show available commands
                         `kat <question>` - Ask the magic 8-ball a yes or no question (`kat 8ball`)
-                        
                         If you'd like to know more about a specific command, use `kat help <command>`.
 
                         Version: `1.0.0`""");
