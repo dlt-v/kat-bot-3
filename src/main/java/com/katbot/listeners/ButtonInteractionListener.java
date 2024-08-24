@@ -1,4 +1,4 @@
-package com.katbot.events;
+package com.katbot.listeners;
 
 import com.katbot.commands.Poll.Poll;
 import com.katbot.commands.Poll.PollManager;

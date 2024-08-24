@@ -1,4 +1,4 @@
-package com.katbot.commands;
+package com.katbot.handlers;
 
 public class TwitterLinkHandler {
     public static String convertTwitterLink(String message) {

@@ -1,6 +1,7 @@
-package com.katbot.commands;
+package com.katbot.handlers;
 
 import com.katbot.commands.About.AboutCommand;
+import com.katbot.commands.Command;
 import com.katbot.commands.EightBall.EightBallCommand;
 import com.katbot.commands.Help.HelpCommand;
 import com.katbot.commands.MinecraftStatus.MinecraftStatusCommand;

@@ -1,7 +1,7 @@
-package com.katbot.events;
+package com.katbot.listeners;
 
-import com.katbot.commands.CommandHandler;
-import com.katbot.commands.TwitterLinkHandler;
+import com.katbot.handlers.CommandHandler;
+import com.katbot.handlers.TwitterLinkHandler;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
