@@ -1,19 +1,23 @@
-package com.katbot.commands;
+package com.katbot.messageHandlers;
 
 import com.katbot.commands.About.AboutCommand;
+import com.katbot.commands.Command;
 import com.katbot.commands.EightBall.EightBallCommand;
 import com.katbot.commands.MinecraftStatus.MinecraftStatusCommand;
 import com.katbot.commands.Poll.PollCommand;
 import com.katbot.commands.Roll.RollCommand;
 import com.katbot.commands.Zabawa.ZabawaCommand;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class CommandHandler {
+
     private final Map<String, Command> commandMap;
 
     public CommandHandler() {

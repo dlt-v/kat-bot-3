@@ -1,4 +1,4 @@
-package com.katbot.events;
+package com.katbot.eventListeners;
 
 import com.katbot.commands.Poll.Poll;
 import com.katbot.commands.Poll.PollManager;
@@ -10,13 +10,15 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class ButtonInteractionListener extends ListenerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GuildMessageListener.class);
     private static final String testingChannelID = System.getenv("testing-channel-id");
     private static final String testingUserID = System.getenv("testing-user-id");
 
@@ -26,18 +28,18 @@ public class ButtonInteractionListener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event)
     {
 
-        logger.info("Button \"" + event.getButton().getLabel() + "\" (Button id:" + event.getButton().getId() + ", Message id: "+ event.getMessage().getId()+") was reacted with.");
+        LOGGER.info("Button \"{}\" (Button id:{}, Message id: {}) was reacted with.", event.getButton().getLabel(), event.getButton().getId(), event.getMessage().getId());
 
         Poll poll = pollManager.getPoll(event.getMessage().getIdLong());
 
         if (poll == null) {
-            logger.error("Poll with id: " + event.getMessage().getIdLong() + " not found. Probably not cached in memory.");
+            LOGGER.error("Poll with id: {} not found. Probably not cached in memory.", event.getMessage().getIdLong());
             event.reply("Poll not found. Probably not cached in memory.").setEphemeral(true).queue();
             return;
         }
 
         if (poll.containsVote(event.getUser().getIdLong())) {
-            logger.info("User with id: " + event.getUser().getIdLong() + " already voted in this poll.");
+            LOGGER.info("User with id: {} already voted in this poll.", event.getUser().getIdLong());
             event.reply("You already voted on this poll.").setEphemeral(true).queue();
             return;
         }
@@ -45,9 +47,9 @@ public class ButtonInteractionListener extends ListenerAdapter {
         event.reply("You chose: \"" + event.getButton().getLabel() + "\"").setEphemeral(true).queue();
 
         if (pollManager.addVote(poll.getId(), new Vote(event.getUser().getIdLong()))) {
-            logger.info("Vote added.");
+            LOGGER.info("Vote added.");
         } else {
-            logger.error("Vote not added.");
+            LOGGER.error("Vote not added.");
         }
 
         MessageEmbed oldEmbed = event.getMessage().getEmbeds().get(0);

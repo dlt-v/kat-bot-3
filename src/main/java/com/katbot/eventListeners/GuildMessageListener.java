@@ -1,74 +1,69 @@
-package com.katbot.events;
+package com.katbot.eventListeners;
 
-import com.katbot.commands.CommandHandler;
+import com.katbot.messageHandlers.CommandHandler;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-
+@Service
 public class GuildMessageListener extends ListenerAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GuildMessageListener.class);
     private static final String testingChannelID = System.getenv("testing-channel-id");
     private static final String testingUserID = System.getenv("testing-user-id");
     private static final String environmentType = System.getenv("environment");
 
-    private final CommandHandler commandHandler = new CommandHandler();
+    private final CommandHandler commandHandler;
+
+    public GuildMessageListener(CommandHandler commandHandler) {
+        this.commandHandler = commandHandler;
+    }
+
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event)
     {
         if (!isMessageValid(event)) return;
+        event.getMessage().reply("I'm here!").queue();
+        String message = event.getMessage().getContentDisplay().toLowerCase();
+
+
         logEvent(event);
 
         commandHandler.handle(event);
     }
 
 
-    /**
-     * Checks if the received message is valid based on specific criteria.
-     * A valid message is one that comes from a text channel (not a DM or other type),
-     * is not sent by a bot, is in the specified testing channel and user,
-     * and starts with "Kat " (case-insensitive).
-     *
-     * @param event The MessageReceivedEvent to evaluate.
-     * @return true if the message is valid, false otherwise.
-     */
     private boolean isMessageValid(MessageReceivedEvent event) {
-        if (event.getChannel().getType() != ChannelType.TEXT) {
-            return false;
-        }
-        if (event.getAuthor().isBot()) {
-            return false;
-        }
+        if (event == null) return false;
+        if (event.getChannel().getType() != ChannelType.TEXT) return false;
+        if (event.getAuthor().isBot()) return false;
+
         if ("testing".equals(environmentType) &&
             !(event.getChannel().getId().equals(testingChannelID) &&
             event.getAuthor().getId().equals(testingUserID))) {
             return false;
         }
-
-        String message = event.getMessage().getContentDisplay().toLowerCase();
-        return message.startsWith("kat ");
+        return true;
+//
+//        String message = event.getMessage().getContentDisplay().toLowerCase();
+//        return message.startsWith("kat ");
     }
 
-    /**
-     * Logs a message received event. Differentiates between messages from a guild
-     * and direct messages.
-     *
-     * @param event The MessageReceivedEvent to log.
-     */
     private void logEvent(MessageReceivedEvent event) {
         if (event.isFromGuild()) {
             // Server channel
-            logger.info("[{}] [#{}] {}: {}",
+            LOGGER.info("[{}] [#{}] {}: {}",
                     event.getGuild().getName(),
                     event.getChannel().getName(),
                     event.getAuthor().getName(),
                     event.getMessage().getContentDisplay());
         } else {
             // Private channel
-            logger.debug("[direct] {}: {}",
+            LOGGER.debug("[direct] {}: {}",
                     event.getAuthor().getName(),
                     event.getMessage().getContentDisplay());
         }
