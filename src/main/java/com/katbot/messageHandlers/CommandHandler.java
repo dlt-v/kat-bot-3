@@ -1,21 +1,25 @@
-package com.katbot.handlers;
+package com.katbot.messageHandlers;
 
 import com.katbot.commands.About.AboutCommand;
 import com.katbot.commands.Command;
 import com.katbot.commands.EightBall.EightBallCommand;
+import com.katbot.commands.Hello.HelloCommand;
 import com.katbot.commands.Help.HelpCommand;
 import com.katbot.commands.MinecraftStatus.MinecraftStatusCommand;
 import com.katbot.commands.Poll.PollCommand;
 import com.katbot.commands.Roll.RollCommand;
 import com.katbot.commands.Zabawa.ZabawaCommand;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CommandHandler {
+@Component
+public class CommandHandler implements Handler {
+
     private final Map<String, Command> commandMap;
 
     public CommandHandler() {
@@ -31,6 +35,7 @@ public class CommandHandler {
                 "will", "is", "does", "can", "should", "has", "was", "might", "would", "could", "are",
                 "do", "did", "have", "hasn't", "aren't", "wasn't", "wouldn't", "couldn't", "won't",
                 "isn't", "doesn't", "hasn't", "haven't", "hadn't"));
+        registerCommand(new HelloCommand(), Arrays.asList("hello", "hi", "hey", "yo", "sup", "greetings"));
     }
 
     private void registerCommand(Command command, List<String> aliases) {
@@ -54,6 +59,14 @@ public class CommandHandler {
                 event.getChannel().sendMessage("Unknown command!").queue();
             }
         }
+    }
 
+    public boolean isKatCommand(MessageReceivedEvent event) {
+        String[] splitMessage = event.getMessage()
+                .getContentDisplay()
+                .toLowerCase()
+                .split("\\s+");
+
+        return splitMessage.length > 0 && splitMessage[0].equals("kat");
     }
 }
