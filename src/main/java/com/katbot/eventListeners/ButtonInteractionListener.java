@@ -14,13 +14,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class ButtonInteractionListener extends ListenerAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GuildMessageListener.class);
-    private static final String testingChannelID = System.getenv("testing-channel-id");
-    private static final String testingUserID = System.getenv("testing-user-id");
 
     private final PollManager pollManager = PollManager.getInstance();
 
@@ -61,7 +60,8 @@ public class ButtonInteractionListener extends ListenerAdapter {
     }
 
     @NotNull
-    private static MessageEmbed buildNewEmbed(@NotNull ButtonInteractionEvent event, MessageEmbed oldEmbed) {
+    private static MessageEmbed buildNewEmbed(@NotNull ButtonInteractionEvent event, @NotNull MessageEmbed oldEmbed) {
+
         EmbedBuilder newEmbedBuilder = new EmbedBuilder();
         newEmbedBuilder.setTitle(oldEmbed.getTitle());
         newEmbedBuilder.setDescription(oldEmbed.getDescription());
@@ -69,9 +69,9 @@ public class ButtonInteractionListener extends ListenerAdapter {
 
         List<MessageEmbed.Field> fields = oldEmbed.getFields();
         for (MessageEmbed.Field field : fields) {
-            int value = Integer.parseInt(field.getValue());
-            if (field.getName().equals(event.getButton().getLabel())) value++;
-            newEmbedBuilder.addField(field.getName(), String.valueOf(value), false);
+            int value = Integer.parseInt(Objects.requireNonNull(field.getValue()));
+            if (Objects.equals(field.getName(), event.getButton().getLabel())) value++;
+            newEmbedBuilder.addField(Objects.requireNonNull(field.getName()), String.valueOf(value), false);
         }
         return newEmbedBuilder.build();
     }
