@@ -1,18 +1,30 @@
 package com.katbot.parameters;
 
 import com.katbot.parameters.enums.EnvironmentEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ParameterService {
+
     private EnvironmentEnum environment;
+    private final String testingChannelID;
+    private final String testingUserID;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParameterService.class);
+
 
     public ParameterService() {
-        this.environment = EnvironmentEnum.PRODUCTION;
+        setEnvironment(System.getenv("environment"));
+        LOGGER.info("Environment is set to: {}", environment);
+
+        testingChannelID = System.getenv("testing-channel-id");
+        testingUserID = System.getenv("testing-user-id");
     }
 
-    public EnvironmentEnum getEnvironment() {
-        return environment;
+    public boolean isInTest() {
+        return environment == EnvironmentEnum.TESTING;
     }
 
     public void setEnvironment(String environmentString) {
@@ -21,5 +33,13 @@ public class ParameterService {
         } catch (IllegalArgumentException e) {
             this.environment = EnvironmentEnum.PRODUCTION;
         }
+    }
+
+    public String getTestingUserID() {
+        return testingUserID;
+    }
+
+    public String getTestingChannelID() {
+        return testingChannelID;
     }
 }
