@@ -1,6 +1,8 @@
 package com.katbot.eventListeners;
 
 import com.katbot.messageHandlers.CommandHandler;
+import com.katbot.messageHandlers.TwitterLinkHandler;
+import com.katbot.parameters.ParameterService;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -13,27 +15,40 @@ import org.springframework.stereotype.Service;
 public class GuildMessageListener extends ListenerAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GuildMessageListener.class);
-    private static final String testingChannelID = System.getenv("testing-channel-id");
-    private static final String testingUserID = System.getenv("testing-user-id");
-    private static final String environmentType = System.getenv("environment");
+    private final String testingChannelID;
+    private final String testingUserID;
 
     private final CommandHandler commandHandler;
+    private final TwitterLinkHandler twitterLinkHandler;
+    private final ParameterService parameterService;
 
-    public GuildMessageListener(CommandHandler commandHandler) {
+    public GuildMessageListener(
+            CommandHandler commandHandler,
+            ParameterService parameterService,
+            TwitterLinkHandler twitterLinkHandler
+    ) {
         this.commandHandler = commandHandler;
+        this.parameterService = parameterService;
+        this.twitterLinkHandler = twitterLinkHandler;
+        this.testingChannelID = parameterService.getTestingChannelID();
+        this.testingUserID = parameterService.getTestingUserID();
     }
 
     @Override
-    public void onMessageReceived(@NotNull MessageReceivedEvent event)
-    {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (!isMessageValid(event)) return;
-        event.getMessage().reply("I'm here!").queue();
-        String message = event.getMessage().getContentDisplay().toLowerCase();
 
+        if (twitterLinkHandler.isTwitterLink(event.getMessage().getContentDisplay())) {
+            logEvent(event);
+            twitterLinkHandler.handle(event);
+            return;
+        }
 
-        logEvent(event);
-
-        commandHandler.handle(event);
+        if (commandHandler.isKatCommand(event)) {
+            logEvent(event);
+            commandHandler.handle(event);
+            return;
+        }
     }
 
 
@@ -42,15 +57,14 @@ public class GuildMessageListener extends ListenerAdapter {
         if (event.getChannel().getType() != ChannelType.TEXT) return false;
         if (event.getAuthor().isBot()) return false;
 
-        if ("testing".equals(environmentType) &&
-            !(event.getChannel().getId().equals(testingChannelID) &&
-            event.getAuthor().getId().equals(testingUserID))) {
+        // If in test mode, only allow messages from the testing channel and a testing user.
+        if (parameterService.isInTest() && !(event.getChannel().getId().equals(testingChannelID) &&
+                event.getAuthor().getId().equals(testingUserID))) {
+            String serverName = event.getGuild().getName().substring(0, Math.min(20, event.getGuild().getName().length()));
+            LOGGER.warn("Received message from unauthorized user ({}) or channel ({}.{}) during testing.", event.getAuthor().getName(), serverName, event.getChannel().getName());
             return false;
         }
         return true;
-//
-//        String message = event.getMessage().getContentDisplay().toLowerCase();
-//        return message.startsWith("kat ");
     }
 
     private void logEvent(MessageReceivedEvent event) {
