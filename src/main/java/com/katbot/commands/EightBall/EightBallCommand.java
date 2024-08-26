@@ -4,6 +4,7 @@ import com.katbot.commands.Command;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class EightBallCommand implements Command {
+
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
         if (args.length == 0) {
