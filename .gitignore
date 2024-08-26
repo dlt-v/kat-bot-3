@@ -3,7 +3,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-.env
+### Logs ###
+*.log
+
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
