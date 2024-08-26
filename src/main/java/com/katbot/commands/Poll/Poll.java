@@ -3,8 +3,8 @@ package com.katbot.commands.Poll;
 import java.util.ArrayList;
 
 public class Poll {
-    private long id;
-    private ArrayList<Vote> votes;
+    private final long id;
+    private final ArrayList<Vote> votes;
 
     public Poll(long id) {
         this.id = id;
