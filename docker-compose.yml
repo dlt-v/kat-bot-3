@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+    katbot:
+        build: .
+        image: kat-bot:1.0
+        ports:
+            - "8080:8080"
+        env_file:
+            - .env
+        depends_on:
+            - db
+        dns:
+            - 8.8.8.8
+            - 1.1.1.1
+        network_mode: "host"
+
+    db:
+        image: postgres:15
+        environment:
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: katbot_db
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready -U katbot_user" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+volumes:
+    postgres_data:

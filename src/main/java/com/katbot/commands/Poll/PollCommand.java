@@ -7,12 +7,14 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class PollCommand implements Command {
 
     private final static PollManager pollManager = PollManager.getInstance();
@@ -51,6 +53,11 @@ public class PollCommand implements Command {
             pollManager.addPoll(poll);
             logger.info("Poll created with ID: {}", poll.getId());
         });
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("poll", "vote");
     }
 
     private List<String> parseArguments(String input) {

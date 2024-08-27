@@ -10,12 +10,15 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Component
 public class MinecraftStatusCommand implements Command {
     private static final Logger LOGGER = LoggerFactory.getLogger(MinecraftStatusCommand.class);
     private static final String host = System.getenv("mc-server-address");
@@ -72,6 +75,11 @@ public class MinecraftStatusCommand implements Command {
             event.getChannel().sendMessage("An error occurred while trying to connect to the server!").queue();
             LOGGER.error("An error occurred while trying to connect to the server!", e);
         }
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("mc-status", "minecraft");
     }
 
 }
