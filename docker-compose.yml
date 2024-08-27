@@ -9,17 +9,13 @@ services:
             - .env
         depends_on:
             - db
-        dns:
-            - 8.8.8.8
-            - 1.1.1.1
-        network_mode: "host"
 
     db:
         image: postgres:15
         environment:
             POSTGRES_USER: ${DB_USERNAME}
             POSTGRES_PASSWORD: ${DB_PASSWORD}
-            POSTGRES_DB: katbot_db
+            POSTGRES_DB: ${DB_NAME}
         ports:
             - "5432:5432"
         volumes:
