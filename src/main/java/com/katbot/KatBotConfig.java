@@ -26,6 +26,7 @@ public class KatBotConfig {
         dataSource.setUrl(System.getenv("DB_URL"));
         dataSource.setUsername(System.getenv("DB_USERNAME"));
         dataSource.setPassword(System.getenv("DB_PASSWORD"));
+        dataSource.setSchema(System.getenv("DB_SCHEMA"));
         return dataSource;
     }
 

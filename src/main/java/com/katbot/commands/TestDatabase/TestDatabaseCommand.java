@@ -19,7 +19,7 @@ public class TestDatabaseCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
         String username = jdbcTemplate.queryForObject(
-                "SELECT username FROM users WHERE username = 'alice'",
+                "SELECT name from katbot_database.test_table where name = 'alice'",
                 String.class
         );
         // Send the retrieved username as a message in the Discord channel

@@ -36,6 +36,7 @@ public class GuildMessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+
         if (!isMessageValid(event)) return;
 
         if (twitterLinkHandler.isTwitterLink(event.getMessage().getContentDisplay())) {
@@ -62,6 +63,11 @@ public class GuildMessageListener extends ListenerAdapter {
                 event.getAuthor().getId().equals(testingUserID))) {
             String serverName = event.getGuild().getName().substring(0, Math.min(20, event.getGuild().getName().length()));
             LOGGER.warn("Received message from unauthorized user ({}) or channel ({}.{}) during testing.", event.getAuthor().getName(), serverName, event.getChannel().getName());
+            return false;
+        }
+        // If not in test mode, allow messages from any channel BUT the testing channel.
+        if (!parameterService.isInTest() && event.getChannel().getId().equals(testingChannelID)) {
+            LOGGER.warn("Received message from channel ({}) designated for testing.", event.getChannel().getName());
             return false;
         }
         return true;
