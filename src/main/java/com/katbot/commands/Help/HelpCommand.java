@@ -6,7 +6,11 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+@Component
 public class HelpCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
@@ -24,6 +28,11 @@ public class HelpCommand implements Command {
             }
             event.getMessage().replyEmbeds(embedBuilder.build()).queue();
         });
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("help", "commands");
     }
 
     private EmbedBuilder buildSpecificCommand(String argument) {

@@ -1,14 +1,6 @@
 package com.katbot.messageHandlers;
 
-import com.katbot.commands.About.AboutCommand;
 import com.katbot.commands.Command;
-import com.katbot.commands.EightBall.EightBallCommand;
-import com.katbot.commands.Hello.HelloCommand;
-import com.katbot.commands.Help.HelpCommand;
-import com.katbot.commands.MinecraftStatus.MinecraftStatusCommand;
-import com.katbot.commands.Poll.PollCommand;
-import com.katbot.commands.Roll.RollCommand;
-import com.katbot.commands.Zabawa.ZabawaCommand;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.stereotype.Component;
 
@@ -20,28 +12,18 @@ import java.util.Map;
 @Component
 public class CommandHandler implements Handler {
 
-    private final Map<String, Command> commandMap;
+    private final Map<String, Command> commandMap = new HashMap<>();
 
-    public CommandHandler() {
-        this.commandMap = new HashMap<>();
-
-        registerCommand(new RollCommand(), Arrays.asList("roll", "dice"));
-        registerCommand(new ZabawaCommand(), Arrays.asList("zabawa", "fun"));
-        registerCommand(new PollCommand(), Arrays.asList("poll", "vote"));
-        registerCommand(new MinecraftStatusCommand(), Arrays.asList("mc-status", "minecraft"));
-        registerCommand(new AboutCommand(), Arrays.asList("about", "info"));
-        registerCommand(new HelpCommand(), Arrays.asList("help", "commands"));
-        registerCommand(new EightBallCommand(), Arrays.asList(
-                "will", "is", "does", "can", "should", "has", "was", "might", "would", "could", "are",
-                "do", "did", "have", "hasn't", "aren't", "wasn't", "wouldn't", "couldn't", "won't",
-                "isn't", "doesn't", "hasn't", "haven't", "hadn't"));
-        registerCommand(new HelloCommand(), Arrays.asList("hello", "hi", "hey", "yo", "sup", "greetings"));
+    public CommandHandler(List<Command> commands) {
+        registerCommands(commands);
     }
 
-    private void registerCommand(Command command, List<String> aliases) {
-        for (String alias : aliases) {
-            commandMap.put(alias, command);
-        }
+    private void registerCommands(List<Command> commands) {
+        commands.forEach(command -> {
+            for (String alias : command.getAliases()) {
+                commandMap.put(alias, command);
+            }
+        });
     }
 
     public void handle(MessageReceivedEvent event) {

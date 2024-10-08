@@ -9,12 +9,31 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import javax.sql.DataSource;
 import java.util.EnumSet;
 
 @Configuration
 @ComponentScan(basePackages = "com.katbot")
 public class KatBotConfig {
+
+    @Bean
+    public DataSource dataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("org.postgresql.Driver");
+        dataSource.setUrl(System.getenv("DB_URL"));
+        dataSource.setUsername(System.getenv("DB_USERNAME"));
+        dataSource.setPassword(System.getenv("DB_PASSWORD"));
+        dataSource.setSchema(System.getenv("DB_SCHEMA"));
+        return dataSource;
+    }
+
+    @Bean
+    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
 
     @Bean
     public JDA jda(GuildMessageListener guildMessageListener, ButtonInteractionListener buttonInteractionListener) throws Exception {

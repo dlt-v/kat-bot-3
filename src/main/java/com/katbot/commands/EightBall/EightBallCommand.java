@@ -2,7 +2,12 @@ package com.katbot.commands.EightBall;
 
 import com.katbot.commands.Command;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
+
+@Component
 public class EightBallCommand implements Command {
 
     @Override
@@ -32,5 +37,13 @@ public class EightBallCommand implements Command {
         int randomIndex = (int) (Math.random() * responses.length);
         event.getMessage().reply(responses[randomIndex]).queue();
 
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return Arrays.asList(
+                "will", "is", "does", "can", "should", "has", "was", "might", "would", "could", "are",
+                "do", "did", "have", "hasn't", "aren't", "wasn't", "wouldn't", "couldn't", "won't",
+                "isn't", "doesn't", "hasn't", "haven't", "hadn't");
     }
 }

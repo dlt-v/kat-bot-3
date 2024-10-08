@@ -3,9 +3,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+dataSources.xml
+
 ### Logs ###
 *.log
-
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

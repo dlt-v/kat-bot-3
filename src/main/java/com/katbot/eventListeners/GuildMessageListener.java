@@ -1,5 +1,6 @@
 package com.katbot.eventListeners;
 
+import com.katbot.messageHandlers.BroadcastChannelHandler;
 import com.katbot.messageHandlers.CommandHandler;
 import com.katbot.messageHandlers.TwitterLinkHandler;
 import com.katbot.parameters.ParameterService;
@@ -21,26 +22,36 @@ public class GuildMessageListener extends ListenerAdapter {
     private final CommandHandler commandHandler;
     private final TwitterLinkHandler twitterLinkHandler;
     private final ParameterService parameterService;
+    private final BroadcastChannelHandler broadcastChannelHandler;
 
     public GuildMessageListener(
             CommandHandler commandHandler,
             ParameterService parameterService,
-            TwitterLinkHandler twitterLinkHandler
+            TwitterLinkHandler twitterLinkHandler,
+            BroadcastChannelHandler broadcastChannelHandler
     ) {
         this.commandHandler = commandHandler;
         this.parameterService = parameterService;
         this.twitterLinkHandler = twitterLinkHandler;
+        this.broadcastChannelHandler = broadcastChannelHandler;
         this.testingChannelID = parameterService.getTestingChannelID();
         this.testingUserID = parameterService.getTestingUserID();
     }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+
         if (!isMessageValid(event)) return;
 
         if (twitterLinkHandler.isTwitterLink(event.getMessage().getContentDisplay())) {
             logEvent(event);
             twitterLinkHandler.handle(event);
+            return;
+        }
+
+        if (broadcastChannelHandler.isBroadcastChannel(event)) {
+            logEvent(event);
+            broadcastChannelHandler.handle(event);
             return;
         }
 
@@ -64,6 +75,12 @@ public class GuildMessageListener extends ListenerAdapter {
             LOGGER.warn("Received message from unauthorized user ({}) or channel ({}.{}) during testing.", event.getAuthor().getName(), serverName, event.getChannel().getName());
             return false;
         }
+        // If not in test mode, allow messages from any channel BUT the testing channel.
+        if (!parameterService.isInTest() && event.getChannel().getId().equals(testingChannelID)) {
+            LOGGER.warn("Received message from channel ({}) designated for testing.", event.getChannel().getName());
+            return false;
+        }
+
         return true;
     }
 

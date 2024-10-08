@@ -3,7 +3,12 @@ package com.katbot.commands.About;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
+
+@Component
 public class AboutCommand implements com.katbot.commands.Command {
 
     @Override
@@ -27,5 +32,10 @@ public class AboutCommand implements com.katbot.commands.Command {
             embedBuilder.setFooter("Created by delta.v", user.getAvatarUrl());
             event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
         });
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return Arrays.asList("about", "info");
     }
 }

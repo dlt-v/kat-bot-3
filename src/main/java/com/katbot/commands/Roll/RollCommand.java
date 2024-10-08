@@ -2,6 +2,7 @@ package com.katbot.commands.Roll;
 
 import com.katbot.commands.Command;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Component
 public class RollCommand implements Command {
 
     @Override
@@ -57,6 +59,11 @@ public class RollCommand implements Command {
                     Example: `kat roll 2d6 +4`
                     """).queue();
         }
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("roll", "dice");
     }
 
     private List<Integer> rollDice(int numberOfDice, int sides) {

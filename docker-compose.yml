@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+    katbot:
+        build: .
+        image: kat-bot:1.0
+        ports:
+            - "8080:8080"
+            - "5005:5005"  # Expose the debugger port
+        env_file:
+            - .env
+        environment:
+            # Enable remote debugging
+            JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+        depends_on:
+            - db
+
+    db:
+        image: postgres:15
+        environment:
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_NAME}
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready -U katbot_user" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+volumes:
+    postgres_data:
