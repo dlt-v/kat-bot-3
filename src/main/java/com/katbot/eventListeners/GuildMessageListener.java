@@ -69,8 +69,7 @@ public class GuildMessageListener extends ListenerAdapter {
         if (event.getAuthor().isBot()) return false;
 
         // If in test mode, only allow messages from the testing channel and a testing user.
-        if (parameterService.isInTest() && !(event.getChannel().getId().equals(testingChannelID) &&
-                event.getAuthor().getId().equals(testingUserID))) {
+        if (parameterService.isInTest() && !(event.getChannel().getId().equals(testingChannelID) && event.getAuthor().getId().equals(testingUserID))) {
             String serverName = event.getGuild().getName().substring(0, Math.min(20, event.getGuild().getName().length()));
             LOGGER.warn("Received message from unauthorized user ({}) or channel ({}.{}) during testing.", event.getAuthor().getName(), serverName, event.getChannel().getName());
             return false;
