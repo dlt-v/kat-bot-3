@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class TwitterLinkHandler implements Handler {
 
     private static final Pattern TWITTER_LINK_PATTERN = Pattern.compile("^https://x\\.com/[A-Za-z0-9_]+/status/\\d+$");
-    private static final Logger LOGGER = LoggerFactory.getLogger(TwitterLinkHandler.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(TwitterLinkHandler.class.getName());
 
     public boolean isTwitterLink(String message) {
         return TWITTER_LINK_PATTERN.matcher(message).matches();
@@ -25,7 +25,7 @@ public class TwitterLinkHandler implements Handler {
             event.getMessage().suppressEmbeds(true).queue();
         } catch (InsufficientPermissionException e) {
             String guildName = event.getGuild().getName().substring(0, Math.min(35, event.getGuild().getName().length()));
-            LOGGER.error("Lacking permission to suppress embeds in server: {}", guildName);
+            logger.error("Lacking permission to suppress embeds in server: {}", guildName);
         }
         event.getMessage().reply(newMessage).queue();
     }

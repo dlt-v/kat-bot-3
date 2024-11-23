@@ -49,11 +49,12 @@ public class GuildMessageListener extends ListenerAdapter {
             return;
         }
 
-        if (broadcastChannelHandler.isBroadcastChannel(event)) {
-            logEvent(event);
-            broadcastChannelHandler.handle(event);
-            return;
-        }
+        // Comment this out during developing in IntelliJ.
+//        if (broadcastChannelHandler.isBroadcastChannel(event)) {
+//            logEvent(event);
+//            broadcastChannelHandler.handle(event);
+//            return;
+//        }
 
         if (commandHandler.isKatCommand(event)) {
             logEvent(event);
