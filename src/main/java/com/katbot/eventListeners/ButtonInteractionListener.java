@@ -1,5 +1,6 @@
 package com.katbot.eventListeners;
 
+import com.katbot.commands.MinecraftStatus.MinecraftStatusCommand;
 import com.katbot.commands.Poll.Poll;
 import com.katbot.commands.Poll.PollManager;
 import com.katbot.commands.Poll.Vote;
@@ -22,10 +23,16 @@ public class ButtonInteractionListener extends ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
 
     private final PollManager pollManager = PollManager.getInstance();
+    private final MinecraftStatusCommand minecraftStatusCommand = new MinecraftStatusCommand();
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event)
     {
+
+        if (event.getInteraction().getButton().getId().equals("mc-status:check_again")) {
+            minecraftStatusCommand.execute(event);
+            return;
+        }
 
         logger.info("Button \"{}\" (Button id:{}, Message id: {}) was reacted with.", event.getButton().getLabel(), event.getButton().getId(), event.getMessage().getId());
 

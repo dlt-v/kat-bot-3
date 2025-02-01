@@ -7,7 +7,10 @@ import com.github.steveice10.mc.protocol.data.status.handler.ServerInfoHandler;
 import com.github.steveice10.packetlib.tcp.TcpClientSession;
 import com.katbot.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,12 +23,21 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class MinecraftStatusCommand implements Command {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MinecraftStatusCommand.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(MinecraftStatusCommand.class);
     private static final String host = System.getenv("mc-server-address");
     public static final int PORT = 25565;
 
+    public void execute(ButtonInteractionEvent event) {
+        execute(event.getChannel());
+    }
+
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
+        execute(event.getChannel());
+    }
+
+    public void execute(MessageChannelUnion channel) {
         MinecraftProtocol protocol = new MinecraftProtocol();
         TcpClientSession session = new TcpClientSession(host, PORT, protocol);
 
@@ -50,7 +62,9 @@ public class MinecraftStatusCommand implements Command {
                 embedBuilder.setDescription(description.toString());
                 embedBuilder.setColor(0x00FF00);
 
-                event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
+                Button button = Button.primary("mc-status:check_again", "Check again");
+
+                channel.sendMessageEmbeds(embedBuilder.build()).setActionRow(button).queue();
 
                 session1.disconnect("Finished");
 
@@ -62,8 +76,8 @@ public class MinecraftStatusCommand implements Command {
                 try {
                     session.connect(false);
                 } catch (Exception e) {
-                    event.getChannel().sendMessage("An error occurred while trying to connect to the server!").queue();
-                    LOGGER.error("An error occurred while trying to connect to the server!", e);
+                    channel.sendMessage("An error occurred while trying to connect to the server!").queue();
+                    logger.error("An error occurred while trying to connect to the server!", e);
                 }
             });
             executor.schedule(() -> {
@@ -72,8 +86,8 @@ public class MinecraftStatusCommand implements Command {
 
             future.get(5, TimeUnit.SECONDS);
         } catch (Exception e) {
-            event.getChannel().sendMessage("An error occurred while trying to connect to the server!").queue();
-            LOGGER.error("An error occurred while trying to connect to the server!", e);
+            channel.sendMessage("An error occurred while trying to connect to the server!").queue();
+            logger.error("An error occurred while trying to connect to the server!", e);
         }
     }
 

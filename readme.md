@@ -75,6 +75,7 @@ Message is then passed to the **Message Handlers** which are responsible for han
 3. **CommandHandler** - Handles commands that start with `kat` and executes the appropriate action.
 4. ~~**BroadcastChannelHandler**~~ (deprecated) - Handles messages that are sent to the broadcast channel and forwards them to the appropriate channel.
 
+Graph made in Mermaid:
 ```mermaid
 graph TD;
    id1[[Event Listeners]] ---> id2[[Message Handlers]]
@@ -82,5 +83,6 @@ graph TD;
    id2[[Message Handlers]] -.-> TimeHandler
    id2[[Message Handlers]] -.-> CommandHandler
    id2[[Message Handlers]] -.-> BroadcastChannelHandler
+   CommandHandler ---> id3[[Commands]]
 
 ```
