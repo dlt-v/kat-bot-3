@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@Deprecated
 public class BroadcastChannelHandler implements  Handler {
 
     private final BroadcastChannelRepository broadcastChannelRepository;
