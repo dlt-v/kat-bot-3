@@ -14,7 +14,8 @@ public class TwitterLinkHandler implements Handler {
     private static final Pattern TWITTER_LINK_PATTERN = Pattern.compile("^https://x\\.com/[A-Za-z0-9_]+/status/\\d+$");
     private static final Logger logger = LoggerFactory.getLogger(TwitterLinkHandler.class.getName());
 
-    public boolean isTwitterLink(String message) {
+    public boolean isViable(MessageReceivedEvent event) {
+        String message = event.getMessage().getContentDisplay().toLowerCase();
         return TWITTER_LINK_PATTERN.matcher(message).matches();
     }
 

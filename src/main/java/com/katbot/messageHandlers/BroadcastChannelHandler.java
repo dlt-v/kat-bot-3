@@ -65,7 +65,7 @@ public class BroadcastChannelHandler implements  Handler {
         return userRepository.doesUserHaveBroadcastEnabled(userId);
     }
 
-    public boolean isBroadcastChannel(MessageReceivedEvent event) {
+    public boolean isViable(MessageReceivedEvent event) {
         Long channelId = event.getChannel().getIdLong();
         List<BroadcastChannel> broadcastChannels = getBroadcastChannels();
 

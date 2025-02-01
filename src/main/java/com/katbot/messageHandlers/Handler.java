@@ -6,4 +6,6 @@ public interface Handler {
 
     void handle(MessageReceivedEvent event);
 
+    boolean isViable(MessageReceivedEvent event);
+
 }

@@ -43,7 +43,7 @@ public class CommandHandler implements Handler {
         }
     }
 
-    public boolean isKatCommand(MessageReceivedEvent event) {
+    public boolean isViable(MessageReceivedEvent event) {
         String[] splitMessage = event.getMessage()
                 .getContentDisplay()
                 .toLowerCase()

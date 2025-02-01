@@ -19,7 +19,7 @@ import java.util.Objects;
 @Component
 public class ButtonInteractionListener extends ListenerAdapter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GuildMessageListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
 
     private final PollManager pollManager = PollManager.getInstance();
 
@@ -27,18 +27,18 @@ public class ButtonInteractionListener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event)
     {
 
-        LOGGER.info("Button \"{}\" (Button id:{}, Message id: {}) was reacted with.", event.getButton().getLabel(), event.getButton().getId(), event.getMessage().getId());
+        logger.info("Button \"{}\" (Button id:{}, Message id: {}) was reacted with.", event.getButton().getLabel(), event.getButton().getId(), event.getMessage().getId());
 
         Poll poll = pollManager.getPoll(event.getMessage().getIdLong());
 
         if (poll == null) {
-            LOGGER.error("Poll with id: {} not found. Probably not cached in memory.", event.getMessage().getIdLong());
+            logger.error("Poll with id: {} not found. Probably not cached in memory.", event.getMessage().getIdLong());
             event.reply("Poll not found. Probably not cached in memory.").setEphemeral(true).queue();
             return;
         }
 
         if (poll.containsVote(event.getUser().getIdLong())) {
-            LOGGER.info("User with id: {} already voted in this poll.", event.getUser().getIdLong());
+            logger.info("User with id: {} already voted in this poll.", event.getUser().getIdLong());
             event.reply("You already voted on this poll.").setEphemeral(true).queue();
             return;
         }
@@ -46,9 +46,9 @@ public class ButtonInteractionListener extends ListenerAdapter {
         event.reply("You chose: \"" + event.getButton().getLabel() + "\"").setEphemeral(true).queue();
 
         if (pollManager.addVote(poll.getId(), new Vote(event.getUser().getIdLong()))) {
-            LOGGER.info("Vote added.");
+            logger.info("Vote added.");
         } else {
-            LOGGER.error("Vote not added.");
+            logger.error("Vote not added.");
         }
 
         MessageEmbed oldEmbed = event.getMessage().getEmbeds().get(0);

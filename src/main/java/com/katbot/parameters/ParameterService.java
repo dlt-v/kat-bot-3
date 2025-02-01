@@ -12,12 +12,12 @@ public class ParameterService {
     private final String testingChannelID;
     private final String testingUserID;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParameterService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ParameterService.class);
 
 
     public ParameterService() {
         setEnvironment(System.getenv("environment"));
-        LOGGER.info("Environment is set to: {}", environment);
+        logger.info("Environment is set to: {}", environment);
 
         testingChannelID = System.getenv("testing-channel-id");
         testingUserID = System.getenv("testing-user-id");
