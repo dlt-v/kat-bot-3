@@ -34,26 +34,39 @@ The application is deployed on a VPS as a Docker container using the exported `.
 1. **Transfer the Tarball**  
    Use an SCP client like MobaXterm, WinSCP, or a GUI to transfer the `kat-bot-1.0.tar` file to your VPS.
 
-2. **Load the Docker Image**  
+2. **Stop the previously running docker image**
+   First, stop the running docker container by running this command:
+   ```bash
+   docker stop <container_id/container_name>
+   ```
+ 
+3. **Load the Docker Image**  
    Once the tarball is on the VPS, log in to the server via SSH and run the following command to load the Docker image:
 
    ```bash
    docker load -i kat-bot-1.0.tar
    ```
 
-3. **Run the Docker Container**  
-   After loading the image, you can run the container. Make sure you have an `.env` file with the required environment variables in the same directory. Use the following command to start the container:
+4. **Run the Docker Container**  
+   After loading the image, you can run the container. Make sure you have an `.env` file with the required environment variables in the same directory.
+   For the container to connect to the database it has to be running in the same docker compose network. docker-compose.yaml should be already present on the VPS.
+
+   For a simple restart with the new image, take down the old image as usual and use this command (just make sure that the .yaml file is in the same directory as you)
 
    ```bash
-   docker run --env-file .env --restart=always -d -p 8080:8080 kat-bot:1.0
+   docker compose up -d
    ```
-
-    - `--env-file .env`: Loads environment variables from the `.env` file.
-    - `--restart=always`: Ensures the container restarts automatically if it stops.
-    - `-d`: Runs the container in detached mode (in the background).
-    - `-p 8080:8080`: Maps port 8080 of the container to port 8080 of the host.
+   - d - stands for detached mode - it means that Docker Compose will run your containers in the background
 
 And boom! You're done!
+
+If you want to check the console of the currently running container you can use:
+   ```bash
+   docker logs -f <image_name>
+   ```
+   
+   Where <image_name> is the generated name of the image.
+   -f - follow flag
 
 ---
 
