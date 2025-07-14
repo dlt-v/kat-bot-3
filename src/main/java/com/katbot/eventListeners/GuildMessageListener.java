@@ -1,9 +1,6 @@
 package com.katbot.eventListeners;
 
-import com.katbot.messageHandlers.BroadcastChannelHandler;
-import com.katbot.messageHandlers.CommandHandler;
-import com.katbot.messageHandlers.TimeHandler;
-import com.katbot.messageHandlers.TwitterLinkHandler;
+import com.katbot.messageHandlers.*;
 import com.katbot.parameters.ParameterService;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -25,14 +22,15 @@ public class GuildMessageListener extends ListenerAdapter {
     private final ParameterService parameterService;
     private final BroadcastChannelHandler broadcastChannelHandler;
     private final TimeHandler timeHandler;
+    private final ChatGptHandler chatGptHandler;
 
     public GuildMessageListener(
             CommandHandler commandHandler,
             ParameterService parameterService,
             TwitterLinkHandler twitterLinkHandler,
             BroadcastChannelHandler broadcastChannelHandler,
-            TimeHandler timeHandler
-    ) {
+            TimeHandler timeHandler,
+            ChatGptHandler chatGptHandler) {
         this.commandHandler = commandHandler;
         this.parameterService = parameterService;
         this.twitterLinkHandler = twitterLinkHandler;
@@ -40,6 +38,7 @@ public class GuildMessageListener extends ListenerAdapter {
         this.timeHandler = timeHandler;
         this.testingChannelID = parameterService.getTestingChannelID();
         this.testingUserID = parameterService.getTestingUserID();
+        this.chatGptHandler = chatGptHandler;
     }
 
     @Override
@@ -53,12 +52,17 @@ public class GuildMessageListener extends ListenerAdapter {
             return;
         }
 
-        // Comment this out during developing in IntelliJ.
-//        if (broadcastChannelHandler.isViable(event)) {
-//            logEvent(event);
-//            broadcastChannelHandler.handle(event);
-//            return;
-//        }
+        if (broadcastChannelHandler.isViable(event)) {
+            logEvent(event);
+            broadcastChannelHandler.handle(event);
+            return;
+        }
+
+        if (chatGptHandler.isViable(event)) {
+            logEvent(event);
+            chatGptHandler.handle(event);
+            return;
+        }
 
         if (commandHandler.isViable(event)) {
             logEvent(event);
