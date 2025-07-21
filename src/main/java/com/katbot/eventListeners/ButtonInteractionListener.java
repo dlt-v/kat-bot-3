@@ -20,7 +20,7 @@ import java.util.Objects;
 @Component
 public class ButtonInteractionListener extends ListenerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(ButtonInteractionListener.class);
 
     private final PollManager pollManager = PollManager.getInstance();
     private final MinecraftStatusCommand minecraftStatusCommand = new MinecraftStatusCommand();

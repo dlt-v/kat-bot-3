@@ -2,6 +2,7 @@ package com.katbot;
 
 import com.katbot.eventListeners.ButtonInteractionListener;
 import com.katbot.eventListeners.GuildMessageListener;
+import com.katbot.eventListeners.ReactionInteractionListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -36,7 +37,11 @@ public class KatBotConfig {
     }
 
     @Bean
-    public JDA jda(GuildMessageListener guildMessageListener, ButtonInteractionListener buttonInteractionListener) throws Exception {
+    public JDA jda (
+            GuildMessageListener guildMessageListener,
+            ButtonInteractionListener buttonInteractionListener,
+            ReactionInteractionListener reactionInteractionListener
+    ) throws Exception {
         EnumSet<GatewayIntent> intents = EnumSet.of(
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.DIRECT_MESSAGES,
@@ -54,7 +59,7 @@ public class KatBotConfig {
         builder.setActivity(Activity.watching("Netflix"));
 
         // Add event listeners
-        builder.addEventListeners(guildMessageListener, buttonInteractionListener);
+        builder.addEventListeners(guildMessageListener, buttonInteractionListener, reactionInteractionListener);
 
         // Build and return JDA instance
         return builder.build();
