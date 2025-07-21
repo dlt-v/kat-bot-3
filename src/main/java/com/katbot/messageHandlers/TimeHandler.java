@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.regex.Pattern;
 
 @Component
+@Deprecated
 public class TimeHandler implements Handler {
 
     private static final Pattern TIME_PATTERN = Pattern.compile(

@@ -21,7 +21,6 @@ public class GuildMessageListener extends ListenerAdapter {
     private final TwitterLinkHandler twitterLinkHandler;
     private final ParameterService parameterService;
     private final BroadcastChannelHandler broadcastChannelHandler;
-    private final TimeHandler timeHandler;
     private final ChatGptHandler chatGptHandler;
 
     public GuildMessageListener(
@@ -29,13 +28,11 @@ public class GuildMessageListener extends ListenerAdapter {
             ParameterService parameterService,
             TwitterLinkHandler twitterLinkHandler,
             BroadcastChannelHandler broadcastChannelHandler,
-            TimeHandler timeHandler,
             ChatGptHandler chatGptHandler) {
         this.commandHandler = commandHandler;
         this.parameterService = parameterService;
         this.twitterLinkHandler = twitterLinkHandler;
         this.broadcastChannelHandler = broadcastChannelHandler;
-        this.timeHandler = timeHandler;
         this.testingChannelID = parameterService.getTestingChannelID();
         this.testingUserID = parameterService.getTestingUserID();
         this.chatGptHandler = chatGptHandler;
@@ -67,12 +64,6 @@ public class GuildMessageListener extends ListenerAdapter {
         if (commandHandler.isViable(event)) {
             logEvent(event);
             commandHandler.handle(event);
-            return;
-        }
-
-        if (timeHandler.isViable(event)) {
-            logEvent(event);
-            timeHandler.handle(event);
             return;
         }
     }
