@@ -1,6 +1,7 @@
-package com.katbot.messageHandlers;
+package com.katbot.messageHandlers.commandHandler;
 
-import com.katbot.commands.Command;
+import com.katbot.messageHandlers.commandHandler.commands.Command;
+import com.katbot.messageHandlers.Handler;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.stereotype.Component;
 

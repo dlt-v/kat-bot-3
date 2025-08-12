@@ -1,6 +1,6 @@
-package com.katbot.commands.Timestamp;
+package com.katbot.messageHandlers.commandHandler.commands.Timestamp;
 
-import com.katbot.commands.Command;
+import com.katbot.messageHandlers.commandHandler.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;

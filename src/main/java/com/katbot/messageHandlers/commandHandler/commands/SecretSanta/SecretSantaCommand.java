@@ -1,6 +1,6 @@
-package com.katbot.commands.SecretSanta;
+package com.katbot.messageHandlers.commandHandler.commands.SecretSanta;
 
-import com.katbot.commands.Command;
+import com.katbot.messageHandlers.commandHandler.commands.Command;
 import com.katbot.parameters.ParameterService;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

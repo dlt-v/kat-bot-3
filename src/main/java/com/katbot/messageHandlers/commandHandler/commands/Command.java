@@ -1,4 +1,4 @@
-package com.katbot.commands;
+package com.katbot.messageHandlers.commandHandler.commands;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 

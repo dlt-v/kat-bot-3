@@ -1,6 +1,6 @@
-package com.katbot.commands.TestDatabase;
+package com.katbot.messageHandlers.commandHandler.commands.TestDatabase;
 
-import com.katbot.commands.Command;
+import com.katbot.messageHandlers.commandHandler.commands.Command;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;

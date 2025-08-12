@@ -16,11 +16,8 @@ public class ReactionInteractionListener extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-        logger.info("event reaction by {}", event.getGuild());
-        if (!isValid(event)) {
-            logger.debug("Message reaction detected in invalid channel.");
-            return;
-        };
+        if (!isValid(event)) return;
+
         logger.info("Message reaction detected in valid format.");
     }
 
@@ -28,8 +25,8 @@ public class ReactionInteractionListener extends ListenerAdapter {
         if (!isInValidChannel(event.getChannel().getId())) return false;
         // check if message belongs to kat-bot
         if (event.getMessageAuthorIdLong() != event.getJDA().getSelfUser().getIdLong()) return false;
-        // check if message is in proper channel
-        if (!event.getChannel().getId().equals("1097579511475875931")) return false;
+        // check if message is in proper channel - temporary test channel
+        if (!event.getChannel().getId().equals("1396947895059480646")) return false;
 
         return true;
     }

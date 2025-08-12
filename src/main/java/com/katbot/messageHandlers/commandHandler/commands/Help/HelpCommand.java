@@ -1,6 +1,6 @@
-package com.katbot.commands.Help;
+package com.katbot.messageHandlers.commandHandler.commands.Help;
 
-import com.katbot.commands.Command;
+import com.katbot.messageHandlers.commandHandler.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;

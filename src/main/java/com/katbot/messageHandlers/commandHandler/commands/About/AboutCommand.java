@@ -1,5 +1,6 @@
-package com.katbot.commands.About;
+package com.katbot.messageHandlers.commandHandler.commands.About;
 
+import com.katbot.messageHandlers.commandHandler.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -9,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class AboutCommand implements com.katbot.commands.Command {
+public class AboutCommand implements Command {
 
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {

@@ -1,6 +1,8 @@
 package com.katbot.eventListeners;
 
 import com.katbot.messageHandlers.*;
+import com.katbot.messageHandlers.commandHandler.CommandHandler;
+import com.katbot.messageHandlers.moderatorCommandHandler.ModeratorCommandHandler;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -18,21 +20,24 @@ public class GuildMessageListener extends ListenerAdapter {
     private final CommandHandler commandHandler;
     private final TwitterLinkHandler twitterLinkHandler;
     private final ChatGptHandler chatGptHandler;
+    private final ModeratorCommandHandler moderatorCommandHandler;
 
     public GuildMessageListener (
             CommandHandler commandHandler,
             TwitterLinkHandler twitterLinkHandler,
-            ChatGptHandler chatGptHandler
+            ChatGptHandler chatGptHandler,
+            ModeratorCommandHandler moderatorCommandHandler
     ) {
         this.commandHandler = commandHandler;
         this.twitterLinkHandler = twitterLinkHandler;
         this.chatGptHandler = chatGptHandler;
+        this.moderatorCommandHandler = moderatorCommandHandler;
     }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 
-        if (!isInValidChannel(event.getMessageId())) return;
+        if (!isInValidChannel(event.getChannel().getId())) return;
 
         if (twitterLinkHandler.isViable(event)) {
             logEvent(event);
@@ -43,6 +48,12 @@ public class GuildMessageListener extends ListenerAdapter {
         if (chatGptHandler.isViable(event)) {
             logEvent(event);
             chatGptHandler.handle(event);
+            return;
+        }
+
+        if (moderatorCommandHandler.isViable(event)) {
+            logEvent(event);
+            moderatorCommandHandler.handle(event);
             return;
         }
 

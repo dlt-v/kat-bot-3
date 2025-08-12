@@ -1,4 +1,4 @@
-package com.katbot.commands.Zabawa;
+package com.katbot.messageHandlers.commandHandler.commands.Zabawa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;

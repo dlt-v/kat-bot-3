@@ -1,4 +1,4 @@
-package com.katbot.commands.Poll;
+package com.katbot.messageHandlers.commandHandler.commands.Poll;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
