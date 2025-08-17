@@ -1,7 +1,7 @@
 package com.katbot.messageHandlers.moderatorCommandHandler;
 
-import com.katbot.messageHandlers.commandHandler.commands.Command;
 import com.katbot.messageHandlers.Handler;
+import com.katbot.messageHandlers.moderatorCommandHandler.moderatorCommands.ModCommand;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.stereotype.Component;
 
@@ -13,13 +13,13 @@ import java.util.Map;
 @Component
 public class ModeratorCommandHandler implements Handler {
 
-    private final Map<String, Command> commandMap = new HashMap<>();
+    private final Map<String, ModCommand> commandMap = new HashMap<>();
 
-    public ModeratorCommandHandler(List<Command> commands) {
+    public ModeratorCommandHandler(List<ModCommand> commands) {
         registerCommands(commands);
     }
 
-    private void registerCommands(List<Command> commands) {
+    private void registerCommands(List<ModCommand> commands) {
         commands.forEach(command -> {
             for (String alias : command.getAliases()) {
                 commandMap.put(alias, command);
@@ -34,7 +34,7 @@ public class ModeratorCommandHandler implements Handler {
                 .split("\\s+");
 
         if (splitMessage.length > 1 && splitMessage[0].equals("katmod")) {
-            Command command = commandMap.get(splitMessage[1]);
+            ModCommand command = commandMap.get(splitMessage[1]);
             if (command != null) {
                 String[] args = Arrays.copyOfRange(splitMessage, 2, splitMessage.length);
                 command.execute(event, args);
