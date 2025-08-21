@@ -128,9 +128,12 @@ public class HelpCommand implements Command {
     private static @NotNull EmbedBuilder buildDefaultCommand(User user) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("KatBot Commands");
-        embedBuilder.setDescription(
-                """
-                        Here are the available commands for KatBot:
+
+        String version = System.getenv("version");
+        version = version != null ? version : "not set";
+
+        String descriptionTemplate = """
+                        Here are the available user commands for KatBot:
 
                         `kat roll` - Roll a dice
                         `kat zabawa` - Fun commands
@@ -140,8 +143,12 @@ public class HelpCommand implements Command {
                         `kat help` - Show available commands
                         `kat <question>` - Ask the magic 8-ball a yes or no question (`kat 8ball`)
                         If you'd like to know more about a specific command, use `kat help <command>`.
+                        To check moderator commands, use `katmod help`.
 
-                        Version: `1.0.0`""");
+                        Version: `%s`""";
+        embedBuilder.setDescription(String.format(descriptionTemplate, version));
+
+
         embedBuilder.setColor(0xFFFF00);
         embedBuilder.setFooter("Created by delta.v", user.getAvatarUrl());
         return embedBuilder;
