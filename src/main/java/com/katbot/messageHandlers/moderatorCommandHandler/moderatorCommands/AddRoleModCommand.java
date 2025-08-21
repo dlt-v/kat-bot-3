@@ -1,13 +1,16 @@
 package com.katbot.messageHandlers.moderatorCommandHandler.moderatorCommands;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class AddRoleModCommand implements ModCommand {
@@ -38,9 +41,11 @@ public class AddRoleModCommand implements ModCommand {
             case "-":
                 removeRole(event, args);
                 break;
-            case "wipe":
-                log.info("Wiping role...");
-                // TODO: Implement an option when all users has been removed from having that role.
+            case "clean":
+                cleanRole(event, args);
+                break;
+            case "banner":
+                createRoleReactionBanner(event, args);
                 break;
             default:
                 log.error("No option '{}' for role command.", args[0]);
@@ -49,6 +54,50 @@ public class AddRoleModCommand implements ModCommand {
         }
     }
 
+    private void createRoleReactionBanner(MessageReceivedEvent event, String[] args) {
+        String roleName = args[1];
+        String optionalEmoji = args.length > 2 ? args[2] : null;
+
+        if (!doesRoleExist(event, roleName)) {
+            event.getMessage().reply("Role with a name '" + args[1] + "' does not exist.").queue();
+            return;
+        }
+
+        String title = roleName.substring(0, 1).toUpperCase() + roleName.substring(1).toLowerCase() + " Role";
+        String description = "If you'd want to have **" + roleName + "** role assigned to you, click on the reaction below this message.";
+        Random random = new Random();
+        int color = random.nextInt(0xFFFFFF + 1);
+        Emoji emoji = optionalEmoji != null ? Emoji.fromUnicode(optionalEmoji) : Emoji.fromUnicode("U+2705");
+
+        EmbedBuilder eb = new EmbedBuilder();
+
+        eb.setTitle(title);
+        eb.setDescription(description);
+        eb.setColor(color);
+
+        event.getChannel().sendMessageEmbeds(eb.build()).queue(
+            something -> {
+                log.info("Role assign banner has been created for role {}", roleName);
+                something.addReaction(emoji).queue();
+            }
+        );
+    }
+
+    private void cleanRole(MessageReceivedEvent event, String[] args) {
+        if (!doesRoleExist(event, args[1])) {
+            event.getMessage().reply("Role with a name '" + args[1] + "' does not exist.").queue();
+            return;
+        }
+
+        // TODO: Implement an option when all users has been removed from having that role.
+        log.warn("User attempted 'katmod role wipe' command which is not implemented yet...");
+        event.getMessage().reply("Sorry, `role clean` functionality is not implemented yet!").queue();
+    }
+
+    private boolean doesRoleExist(MessageReceivedEvent event, String roleName) {
+        List<Role> existingRoles = event.getGuild().getRolesByName(roleName, true);
+        return !existingRoles.isEmpty();
+    }
 
 
     /**
@@ -94,7 +143,7 @@ public class AddRoleModCommand implements ModCommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("role");
+        return List.of("role", "-r");
     }
 
     private boolean arePermissionsValid(MessageReceivedEvent event) {
