@@ -14,6 +14,7 @@ import java.util.Random;
 
 @Component
 public class AddRoleModCommand implements ModCommand {
+
     private static final Logger log = LoggerFactory.getLogger(AddRoleModCommand.class);
 
     @Override
@@ -115,6 +116,7 @@ public class AddRoleModCommand implements ModCommand {
         log.info("Creating a guild role with a name of {}...", args[1]);
         event.getGuild().createRole().setName(args[1]).queue(
                 role -> {
+                    role.getManager().setMentionable(true).queue();
                     event.getMessage().reply("Role: <@&" + role.getId() + "> has been created.").queue();
                 }
         );
@@ -156,6 +158,11 @@ public class AddRoleModCommand implements ModCommand {
             event.getMessage().reply("Sorry, something went wrong, check logs!").queue();
         }
         return false;
+    }
+
+    @Override
+    public String getShortDocs() {
+        return "server role related commands";
     }
 }
 
