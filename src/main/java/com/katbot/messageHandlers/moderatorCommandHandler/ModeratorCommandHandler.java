@@ -30,26 +30,27 @@ public class ModeratorCommandHandler implements Handler {
     public void handle(MessageReceivedEvent event) {
         String[] splitMessage = event.getMessage()
                 .getContentDisplay()
-                .toLowerCase()
                 .split("\\s+");
 
-        if (splitMessage.length > 1 && splitMessage[0].equals("katmod")) {
-            ModCommand command = commandMap.get(splitMessage[1]);
+        if (splitMessage.length > 1 && splitMessage[0].equalsIgnoreCase("katmod")) {
+
+            ModCommand command = commandMap.get(splitMessage[1].toLowerCase());
+
             if (command != null) {
                 String[] args = Arrays.copyOfRange(splitMessage, 2, splitMessage.length);
                 command.execute(event, args);
             } else {
                 event.getChannel().sendMessage("Unknown command!").queue();
             }
+
         }
     }
 
     public boolean isViable(MessageReceivedEvent event) {
         String[] splitMessage = event.getMessage()
                 .getContentDisplay()
-                .toLowerCase()
                 .split("\\s+");
 
-        return splitMessage.length > 0 && splitMessage[0].equals("katmod");
+        return splitMessage.length > 0 && splitMessage[0].equalsIgnoreCase("katmod");
     }
 }
