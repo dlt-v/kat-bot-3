@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
@@ -107,17 +108,28 @@ public class AddRoleModCommand implements ModCommand {
      * @param args argument list
      */
     private void addRole(MessageReceivedEvent event, String[] args) {
-        List<Role> existingRoles = event.getGuild().getRolesByName(args[1], true);
+        String roleName = args[1];
+        String colorCode = args.length >= 3 ? args[2] : generateRandomColorHexCode();
+        Color color;
+        try {
+            color = parseColorFromHexCode(colorCode);
+        } catch (NumberFormatException e) {
+            log.error("Value '{}' cannot be converted into a Color object.", colorCode);
+            event.getMessage().reply("Value `" + colorCode + "` cannot be converted into color. Please provide a valid HEX format.").queue();
+            return;
+        }
+
+        List<Role> existingRoles = event.getGuild().getRolesByName(roleName, true);
         if (!existingRoles.isEmpty()) {
             event.getMessage().reply("Role with that name: <@&" + existingRoles.get(0).getId() + "> already exists.").queue();
             return;
         }
 
-        log.info("Creating a guild role with a name of {}...", args[1]);
-        event.getGuild().createRole().setName(args[1]).queue(
+        log.info("Creating a guild role with a name of {}...", roleName);
+        event.getGuild().createRole().setName(args[1]).setColor(color).queue(
                 role -> {
                     role.getManager().setMentionable(true).queue();
-                    event.getMessage().reply("Role: <@&" + role.getId() + "> has been created.").queue();
+                    event.getMessage().reply("Role <@&" + role.getId() + "> has been created.").queue();
                 }
         );
 
@@ -131,14 +143,15 @@ public class AddRoleModCommand implements ModCommand {
     private void removeRole(MessageReceivedEvent event, String[] args) {
         List<Role> existingRoles = event.getGuild().getRolesByName(args[1], true);
         if (existingRoles.isEmpty()) {
-            event.getMessage().reply("Role with a name '" + args[1] + "' does not exist.").queue();
+            event.getMessage().reply("Role `@" + args[1] + "` does not exist on this server.").queue();
             return;
         }
 
-        log.info("Deleting a guild role with the name of {}...", args[1]);
+        String foundRoleName = existingRoles.get(0).getName();
+        log.info("Deleting role '@{}' from server {}.", foundRoleName, event.getGuild().getName());
         existingRoles.get(0).delete().queue(
                 role -> {
-                    event.getMessage().reply("Role with the name '" + args[1] + "' has been removed.").queue();
+                    event.getMessage().reply("Role `@" + foundRoleName + "` has been removed from this server.").queue();
                 }
         );
     }
@@ -163,6 +176,16 @@ public class AddRoleModCommand implements ModCommand {
     @Override
     public String getShortDocs() {
         return "server role related commands";
+    }
+
+    private String generateRandomColorHexCode() {
+        Random random = new Random();
+        int nextInt = random.nextInt(0xffffff + 1);
+        return String.format("#%06x", nextInt);
+    }
+
+    private Color parseColorFromHexCode(String hexCode) {
+        return Color.decode(hexCode);
     }
 }
 
