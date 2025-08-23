@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class RoleAssignmentHandler implements ReactionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(RoleAssignmentHandler.class);
-    private static final Pattern ROLE_REGEX = Pattern.compile("^If you'd want to have \\*\\*(.*?)\\*\\* role assigned to you, click on the reaction below this message\\.$");
+    private static final Pattern ROLE_REGEX = Pattern.compile("^If you'd want to have \\*\\*(.*?)\\*\\* role assigned to you, click on the reaction below this message\\..*");
 
     @Override
     public boolean isValid(GenericMessageReactionEvent event) {
@@ -47,10 +47,10 @@ public class RoleAssignmentHandler implements ReactionHandler {
 
         if (reactionAdded) {
             event.getGuild().addRoleToMember(user, role).complete();
-            logger.info("Assigning a role '{}' to {} in server '{}'", role.getName(), user.getName(), event.getGuild().getName());
+            logger.info("Assigning a role '{}' to {} in server '{}'.", role.getName(), user.getName(), event.getGuild().getName());
         } else {
             event.getGuild().removeRoleFromMember(user, role).complete();
-            logger.info("Removing a role '{}' from {} in server '{}'", role.getName(), user.getName(), event.getGuild().getName());
+            logger.info("Removing a role '{}' from {} in server '{}'.", role.getName(), user.getName(), event.getGuild().getName());
         }
     }
 

@@ -60,22 +60,23 @@ public class AddRoleModCommand implements ModCommand {
         String roleName = args[1];
         String optionalEmoji = args.length > 2 ? args[2] : null;
 
-        if (!doesRoleExist(event, roleName)) {
+        List<Role> foundRoleList = event.getGuild().getRolesByName(roleName, true);
+        if (foundRoleList.isEmpty()) {
             event.getMessage().reply("Role with a name '" + args[1] + "' does not exist.").queue();
             return;
         }
+        Role foundRole = foundRoleList.get(0);
 
-        String title = roleName.substring(0, 1).toUpperCase() + roleName.substring(1).toLowerCase() + " Role";
-        String description = "If you'd want to have **" + roleName + "** role assigned to you, click on the reaction below this message.";
-        Random random = new Random();
-        int color = random.nextInt(0xFFFFFF + 1);
+        String title = foundRole.getName() + " Role";
+        String description = "If you'd want to have **" + foundRole.getName() + "** role assigned to you, click on the reaction below this message.";
+        if (optionalEmoji != null) description += " [ " + optionalEmoji + " ]";
         Emoji emoji = optionalEmoji != null ? Emoji.fromUnicode(optionalEmoji) : Emoji.fromUnicode("U+2705");
 
         EmbedBuilder eb = new EmbedBuilder();
 
         eb.setTitle(title);
         eb.setDescription(description);
-        eb.setColor(color);
+        eb.setColor(foundRole.getColorRaw());
 
         event.getChannel().sendMessageEmbeds(eb.build()).queue(
             something -> {
@@ -121,7 +122,8 @@ public class AddRoleModCommand implements ModCommand {
 
         List<Role> existingRoles = event.getGuild().getRolesByName(roleName, true);
         if (!existingRoles.isEmpty()) {
-            event.getMessage().reply("Role with that name: <@&" + existingRoles.get(0).getId() + "> already exists.").queue();
+            log.error("Attempted to create a role {} on server {} but role with that name already exists.", roleName, event.getGuild().getName());
+            event.getMessage().reply("Role with that name: <@&" + existingRoles.get(0).getId() + "> already exists on this server.").queue();
             return;
         }
 
