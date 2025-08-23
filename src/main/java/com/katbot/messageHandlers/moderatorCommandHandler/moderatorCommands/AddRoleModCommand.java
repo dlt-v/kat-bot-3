@@ -175,11 +175,6 @@ public class AddRoleModCommand implements ModCommand {
         return false;
     }
 
-    @Override
-    public String getShortDocs() {
-        return "server role related commands";
-    }
-
     private String generateRandomColorHexCode() {
         Random random = new Random();
         int nextInt = random.nextInt(0xffffff + 1);
@@ -188,6 +183,51 @@ public class AddRoleModCommand implements ModCommand {
 
     private Color parseColorFromHexCode(String hexCode) {
         return Color.decode(hexCode);
+    }
+
+    @Override
+    public String getShortDocs() {
+        return "server role related commands";
+    }
+
+    @Override
+    public String getDocs() {
+        return """
+                `role/-r` command allows a moderator to manage roles in a given server.
+                Both Kat-Bot and the user need to have `MANAGE_ROLES` permissions assigned.
+                `role` or `-r` can be used interchangeably.
+                
+                **Adding roles:**
+                
+                `katmod role add/+ <role_name> <color>` - bot will create a basic role with given name from `<role_name>` and assign a color to it.
+                `<color>` is optional and if not provided, a random color will be generated.
+                `<color>` needs to be provided in given format: "#ddd" or "#dddddd" where d is a digit.
+                `+` or `add` can be used interchangeably.
+                
+                **Example:**
+                
+                `katmod role add PEAK` - creates a role with name "PEAK" and assigns it a random color.
+                `katmod -r + Repo #59bf0b` - creates a role with name "Repo" and assigns it a greenish color.
+                
+                **Removing roles:**
+                
+                `katmod role remove/rm/- <role_name>` - bot will remove a role that matches given name from `<role_name>`. Name detection is __case insensitive__.
+                `remove`, `rm` or `-` can be used interchangeably.
+                
+                **Example:**
+                
+                `katmod role rm PEAK` - removes a role with a name "PEAK" (or "peak" or "pEaK", etc) from the server.
+                `katmod -r - Repo` - removes a role with a name "Repo" (or as above) from the server.
+                
+                **Creating role assignment banner:**
+                
+                `katmod role banner <role_name> <emoji>` - creates a message and adds a reaction to it. Users can interact with said reaction to have the given role assigned to them. Name detection of the role is __case insensitive__.
+                `<emoji>` is optional and if absent a default `✅` emoji will be provided as reaction.
+                
+                **Example:**
+                `katmod role banner peak` - creates a banner and when user reacts to it, bot will assign the given role.
+                `katmod -r banner Repo ⚙️` - creates a banner and uses `⚙️` as the reaction emoji.
+                """;
     }
 }
 
