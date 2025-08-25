@@ -1,6 +1,6 @@
 package com.katbot.commands;
 
-import com.katbot.commands.Zabawa.ZabawaCommand;
+import com.katbot.messageHandlers.commandHandler.commands.Zabawa.ZabawaCommand;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;

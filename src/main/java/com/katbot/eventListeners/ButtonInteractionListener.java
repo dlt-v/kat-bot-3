@@ -1,9 +1,9 @@
 package com.katbot.eventListeners;
 
-import com.katbot.commands.MinecraftStatus.MinecraftStatusCommand;
-import com.katbot.commands.Poll.Poll;
-import com.katbot.commands.Poll.PollManager;
-import com.katbot.commands.Poll.Vote;
+import com.katbot.messageHandlers.commandHandler.commands.MinecraftStatus.MinecraftStatusCommand;
+import com.katbot.messageHandlers.commandHandler.commands.Poll.Poll;
+import com.katbot.messageHandlers.commandHandler.commands.Poll.PollManager;
+import com.katbot.messageHandlers.commandHandler.commands.Poll.Vote;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -20,7 +20,7 @@ import java.util.Objects;
 @Component
 public class ButtonInteractionListener extends ListenerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(GuildMessageListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(ButtonInteractionListener.class);
 
     private final PollManager pollManager = PollManager.getInstance();
     private final MinecraftStatusCommand minecraftStatusCommand = new MinecraftStatusCommand();
