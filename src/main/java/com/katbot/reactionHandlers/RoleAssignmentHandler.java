@@ -20,9 +20,10 @@ public class RoleAssignmentHandler implements ReactionHandler {
 
     @Override
     public boolean isValid(GenericMessageReactionEvent event) {
-        if (event.retrieveMessage().complete().getEmbeds().isEmpty()) return false;
+        Message message = event.retrieveMessage().complete();
+        if (message.getEmbeds().isEmpty()) return false;
 
-        String description = event.retrieveMessage().complete().getEmbeds().get(0).getDescription();
+        String description = message.getEmbeds().get(0).getDescription();
         if (description == null) return false;
 
         Matcher matcher = ROLE_REGEX.matcher(description);
@@ -67,7 +68,7 @@ public class RoleAssignmentHandler implements ReactionHandler {
             return matcher.group(1);
         } else {
             logger.error("Cannot parse the description from Kat-Bot's embed.");
-            return null;
+            throw new RuntimeException("Cannot parse the description from Kat-Bot's embed.");
         }
 
     }
