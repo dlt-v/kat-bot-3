@@ -73,7 +73,15 @@ public class SecretSantaCommand implements Command {
 
             guild.findMembers(member -> member.getRoles().contains(selectedRole))
                     .onSuccess(secretSantaCandidates -> {
-                        processCandidates(event, secretSantaCandidates, args);
+                        try {
+                            processCandidates(event, secretSantaCandidates, args);
+                        } catch (SecretSantaException e) {
+                            logger.error("Secret santa functionality has thrown an exception in onSuccess: {}", e.getMessage());
+                            event.getMessage().reply("Secret santa functionality has thrown an exception: " + e.getMessage()).queue();
+                        } catch (Exception e) {
+                            logger.error("Unknown error has occurred in onSuccess: {}", e.getMessage());
+                            event.getMessage().reply("Unknown error has occurred: " + e.getMessage()).queue();
+                        }
                     })
                     .onError(error -> {
                         logger.error("Error fetching candidates: {}", error.getMessage());
@@ -97,13 +105,58 @@ public class SecretSantaCommand implements Command {
 
         Map<String, List<String>> allPreviousPairs = fetchAllPreviousPairs(history);
 
+        List<String> currentSenders = candidateList.stream()
+                .map(member -> history.getUserNameById(member.getId()))
+                .filter(Objects::nonNull) // Filter out candidates not in the JSON file
+                .toList();
+
+        if (currentSenders.isEmpty()) {
+            event.getMessage().reply("No valid participants found in the Secret Santa history data.").queue();
+            return;
+        }
+
+        Map<String, String> assignments = generateAssignments(currentSenders, allPreviousPairs);
+
+        if (Arrays.asList(args).contains("-info")) {
+            logger.info("-info flag detected. Displaying diagnostic info");
+            displayDiagnosticInfo(event, allPreviousPairs, candidateList, history, assignments, isReal);
+        }
+
+
+    }
+
+    private void displayDiagnosticInfo(MessageReceivedEvent event, Map<String, List<String>> allPreviousPairs, List<Member> candidateList, SecretSantaHistory history, Map<String, String> assignments, boolean isReal) {
         String formattedPairs = allPreviousPairs.entrySet().stream()
                 .map(entry -> "- " + capitalizeFirstLetter(entry.getKey()) + " gifted " + entry.getValue())
                 .collect(Collectors.joining("\n"));
 
-        String message = "**All Past Secret Santa Pairs:**\n" + formattedPairs;
+        String message = isReal ? "**This is a real run.**\n\n" : "**This is a testing run.**\n\n";
+        message += "All past Secret Santa pairs:\n" + formattedPairs;
+        String currentParticipants = formatCurrentParticipants(history, candidateList);
+        message += "\n\nThis edition's participants (" + candidateList.size() + "):\n" + currentParticipants;
 
+        String currentAssignments = formatCurrentAssignments(assignments);
+        message += "\nThis edition's assignments (for tests):\n" + currentAssignments;
         event.getMessage().reply(message).queue();
+    }
+
+    private String formatCurrentAssignments(Map<String, String> assignments) {
+        if (assignments == null || assignments.isEmpty()) {
+            return "No assignments were generated.";
+        }
+        return assignments.entrySet().stream()
+                .map(entry -> "- " + capitalizeFirstLetter(entry.getKey()) + " gifts " + capitalizeFirstLetter(entry.getValue()))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String formatCurrentParticipants(SecretSantaHistory history, List<Member> candidates) {
+        StringBuilder formattedList = new StringBuilder();
+
+        for (Member candidate : candidates) {
+            formattedList.append("- ").append(capitalizeFirstLetter(history.getUserNameById(candidate.getId()))).append("\n");
+        }
+
+        return formattedList.toString();
     }
 
     private SecretSantaHistory loadHistory() throws SecretSantaException {
@@ -147,36 +200,58 @@ public class SecretSantaCommand implements Command {
         return allPairs;
     }
 
-//        List<Member> secretSantaCandidates = santaGuild.getMembersWithRoles(selectedRole);
-//        event.getMessage().reply("Candidate amount: " + secretSantaCandidates.size()).queue();
+    private Map<String, String> generateAssignments(List<String> senders, Map<String, List<String>> previousPairs) {
+        List<String> receivers = new ArrayList<>(senders);
+        Collections.shuffle(receivers);
 
-//        HashMap<String, String> userMap = fetchAllSecretSantaUsers();
-//        Map<String, String> lastYearCombinationsMap = fetchCombinationsFromLastYear();
-//
-//        List<String> unassignedReceiver = new ArrayList<>(userMap.keySet());
-//        Map<String, String> senderReceiverMap = new HashMap<>();
-//
-//        // Assign each user a Secret Santa recipient
-//        for (String sender : userMap.keySet()) {
-//            boolean wasSenderNotAlreadyAReceiver = unassignedReceiver.remove(sender);
-//            String lastYearReceiver = null;
-//            boolean lastYearRemoved = false;
-//            if (lastYearCombinationsMap.containsKey(sender)) {
-//                lastYearReceiver = lastYearCombinationsMap.get(sender);
-//                lastYearRemoved = unassignedReceiver.remove(lastYearReceiver);
-//            }
-//
-//            String receiver = unassignedReceiver.get((int) (Math.random() * unassignedReceiver.size()));
-//            unassignedReceiver.remove(receiver);
-//
-//            senderReceiverMap.put(sender, receiver);
-//
-//            if (lastYearReceiver != null && lastYearRemoved) unassignedReceiver.add(lastYearReceiver);
-//            if (wasSenderNotAlreadyAReceiver) unassignedReceiver.add(sender);
-//        }
-//        sendAssignments(event, senderReceiverMap, userMap, isReal);
+        Map<String, String> assignments = new HashMap<>();
 
+        final int MAX_RETRIES = 5 * senders.size();
+        int retries = 0;
 
+        for (String sender: senders) {
+            String receiver = null;
+            int attempt = 0;
+
+            // Loop until a valid receiver is found or max attempts reached
+            while (receiver == null && attempt < MAX_RETRIES) {
+                if (receivers.isEmpty()) throw new SecretSantaException("Not enough unique receivers to complete pairings.");
+
+                String potentialReceiver = receivers.remove(0);
+
+                // 1. Check for self-assignment (Sender != Receiver)
+                boolean isSelfAssignment = potentialReceiver.equals(sender);
+
+                // 2. Check if sender has gifted this receiver before
+                List<String> giftedHistory = previousPairs.getOrDefault(sender, Collections.emptyList());
+                boolean hasGiftedBefore = giftedHistory.contains(potentialReceiver);
+
+                if (!isSelfAssignment && !hasGiftedBefore) {
+                    logger.info("Found a valid match. {} prepares a gift for {}", sender, potentialReceiver);
+                    receiver = potentialReceiver;
+                } else {
+                    receivers.add(potentialReceiver);
+                    potentialReceiver = null;
+
+                    attempt++;
+                    retries++;
+                }
+
+                if (retries > MAX_RETRIES) {
+                    throw new SecretSantaException("Could not generate valid pairings after multiple retries. History constraints might be too tight.");
+                }
+            }
+
+            if (receiver == null) {
+                // This should be caught by the MAX_RETRIES check above, but for final safety:
+                throw new SecretSantaException("Failed to find a valid recipient for sender: " + sender);
+            }
+
+            assignments.put(sender, receiver);
+        }
+
+        return assignments;
+    }
 
     private void sendAssignments(MessageReceivedEvent event, Map<String, String> senderReceiverMap, HashMap<String, String> userMap, boolean isReal) {
 
@@ -214,36 +289,6 @@ public class SecretSantaCommand implements Command {
 
         }
 
-    }
-
-    // Top-level class for the entire JSON file
-    public static class SecretSantaHistory {
-        private Map<String, String> users;
-        private List<EditionHistory> history;
-
-        public Map<String, String> getUsers() { return users; }
-        public void setUsers(Map<String, String> users) { this.users = users; }
-
-        public List<EditionHistory> getHistory() { return history; }
-        public void setHistory(List<EditionHistory> history) { this.history = history; }
-    }
-
-    // Class for each item in the "history" array
-    public static class EditionHistory {
-        private String edition;
-        private Map<String, String> pairs;
-
-        public String getEdition() { return edition; }
-        public void setEdition(String edition) { this.edition = edition; }
-
-        public Map<String, String> getPairs() { return pairs; }
-        public void setPairs(Map<String, String> pairs) { this.pairs = pairs; }
-    }
-
-
-    private Map<String, String> fetchCombinationsFromLastYear() {
-        // TODO: Fetch all combinations from the database next year
-        return Map.of();
     }
 
     @Override
