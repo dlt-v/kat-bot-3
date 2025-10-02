@@ -24,6 +24,9 @@ public class SecretSantaCommand implements Command {
 
     private final ParameterService parameterService;
     private static final Logger logger = LoggerFactory.getLogger(SecretSantaCommand.class);
+    private SecretSantaHistory secretSantaHistory;
+
+    private final String ROLE_NAME = "Krampus-25";
 
     public SecretSantaCommand(ParameterService parameterService) {
         this.parameterService = parameterService;
@@ -52,12 +55,11 @@ public class SecretSantaCommand implements Command {
     }
 
     private Role fetchCurrentRole(Guild guild) {
-        String roleName = "krampus-25"; // TODO: Get this programmatically.
-        List<Role> roles = guild.getRolesByName(roleName, true);
+        List<Role> roles = guild.getRolesByName(ROLE_NAME, true);
 
         if (roles.isEmpty()) {
-            logger.error("Can't find a role with a name: {}", roleName);
-            throw new SecretSantaException("Can't find a role with a name: " + roleName);
+            logger.error("Can't find a role with a name: {}", ROLE_NAME);
+            throw new SecretSantaException("Can't find a role with a name: " + ROLE_NAME);
         }
 
         return roles.get(0);
@@ -85,7 +87,7 @@ public class SecretSantaCommand implements Command {
                     })
                     .onError(error -> {
                         logger.error("Error fetching candidates: {}", error.getMessage());
-                        throw new SecretSantaException("Error fetching candidates.");
+                        event.getMessage().reply("An error occurred while fetching participants: " + error.getMessage()).queue();
                     });
 
         } catch (SecretSantaException e) {
@@ -99,14 +101,14 @@ public class SecretSantaCommand implements Command {
 
     private void processCandidates(MessageReceivedEvent event, List<Member> candidateList, String[] args) {
         boolean isReal = Arrays.asList(args).contains("-real"); // Don't add it when testing the app
+        if (isReal) logger.info("-real flag detected. Formatting messages accordingly.");
 
-        SecretSantaHistory history = loadHistory();
-        Map<String, String> allUsers = history.getUsers();
+        this.secretSantaHistory = loadHistory();
 
-        Map<String, List<String>> allPreviousPairs = fetchAllPreviousPairs(history);
+        Map<String, List<String>> allPreviousPairs = fetchAllPreviousPairs();
 
         List<String> currentSenders = candidateList.stream()
-                .map(member -> history.getUserNameById(member.getId()))
+                .map(member -> this.secretSantaHistory.getUserNameById(member.getId()))
                 .filter(Objects::nonNull) // Filter out candidates not in the JSON file
                 .toList();
 
@@ -119,24 +121,31 @@ public class SecretSantaCommand implements Command {
 
         if (Arrays.asList(args).contains("-info")) {
             logger.info("-info flag detected. Displaying diagnostic info");
-            displayDiagnosticInfo(event, allPreviousPairs, candidateList, history, assignments, isReal);
+            displayDiagnosticInfo(event, allPreviousPairs, candidateList, assignments, isReal);
         }
 
-
+        sendAssignments(event, assignments, isReal);
     }
 
-    private void displayDiagnosticInfo(MessageReceivedEvent event, Map<String, List<String>> allPreviousPairs, List<Member> candidateList, SecretSantaHistory history, Map<String, String> assignments, boolean isReal) {
+    private void displayDiagnosticInfo(MessageReceivedEvent event, Map<String, List<String>> allPreviousPairs, List<Member> candidateList, Map<String, String> assignments, boolean isReal) {
         String formattedPairs = allPreviousPairs.entrySet().stream()
                 .map(entry -> "- " + capitalizeFirstLetter(entry.getKey()) + " gifted " + entry.getValue())
                 .collect(Collectors.joining("\n"));
 
         String message = isReal ? "**This is a real run.**\n\n" : "**This is a testing run.**\n\n";
         message += "All past Secret Santa pairs:\n" + formattedPairs;
-        String currentParticipants = formatCurrentParticipants(history, candidateList);
+        String currentParticipants = formatCurrentParticipants(this.secretSantaHistory, candidateList);
         message += "\n\nThis edition's participants (" + candidateList.size() + "):\n" + currentParticipants;
 
-        String currentAssignments = formatCurrentAssignments(assignments);
-        message += "\nThis edition's assignments (for tests):\n" + currentAssignments;
+//        if (isReal) {
+//            String currentAssignments = formatCurrentAssignments(assignments);
+//            message += "\nThis edition's assignments (for tests):\n" + currentAssignments;
+//        } else {
+//
+//        }
+
+        message += "\nThis year's assignments are going to be sent to Secret Santa Host in spoilered message";
+
         event.getMessage().reply(message).queue();
     }
 
@@ -180,12 +189,12 @@ public class SecretSantaCommand implements Command {
      * Aggregates all Secret Santa pairs from all editions, allowing multiple
      * receivers for the same sender across different years.
      */
-    private Map<String, List<String>> fetchAllPreviousPairs(SecretSantaHistory history) {
+    private Map<String, List<String>> fetchAllPreviousPairs() {
         // Change the return type to map a Sender to a List of their past Receivers
         Map<String, List<String>> allPairs = new HashMap<>();
 
-        if (history.getHistory() != null) {
-            for (EditionHistory edition : history.getHistory()) {
+        if (this.secretSantaHistory.getHistory() != null) {
+            for (EditionHistory edition : this.secretSantaHistory.getHistory()) {
                 if (edition.getPairs() != null) {
 
                     // Iterate through the pairs of the current edition
@@ -231,7 +240,6 @@ public class SecretSantaCommand implements Command {
                     receiver = potentialReceiver;
                 } else {
                     receivers.add(potentialReceiver);
-                    potentialReceiver = null;
 
                     attempt++;
                     retries++;
@@ -253,41 +261,42 @@ public class SecretSantaCommand implements Command {
         return assignments;
     }
 
-    private void sendAssignments(MessageReceivedEvent event, Map<String, String> senderReceiverMap, HashMap<String, String> userMap, boolean isReal) {
+    private void sendAssignments(MessageReceivedEvent event, Map<String, String> assignmentMap, boolean isReal) {
 
-        String answer = senderReceiverMap.entrySet().stream()
+        // Send the host message for debug.
+        String answer = assignmentMap.entrySet().stream()
                 .map(entry -> entry.getKey().charAt(0) + "||" + entry.getKey().substring(1) + "||" + " -> " + entry.getValue().charAt(0) + "||" + entry.getValue().substring(1) + "||")
                 .reduce("", (acc, entry) -> acc + entry + "\n");
 
-        if (parameterService.isInTest()) {
+        User user = event.getJDA().retrieveUserById(parameterService.getTestingUserID()).complete();
+        if (user == null) {
+            logger.error("Secret Santa host was not found.");
+            throw new SecretSantaException("Secret Santa host could not be found.");
+        }
+        answer = "Secret Krampus assignments:\n" + answer;
+        answer = isReal ? "**This is not a test.**\n" : "**This is just a test.**\n" + answer;
+        final String finalAnswer = answer;
+        user.openPrivateChannel().queue(channel -> channel.sendMessage(finalAnswer).queue());
+        logger.info("A debug message has been sent to Secret Santa host.");
 
-            answer = "**TEST** Secret Santa assignments (generated on " + (new Date()) + "):\n" + answer;
-            logger.info(answer);
-            event.getMessage().reply(answer).queue();
 
-        } else {
+        // Sending a message to individual secret santa participant
+        assignmentMap.forEach((senderName, receiverName) -> {
+            String senderId = this.secretSantaHistory.getIdByUserName(senderName);
+            User senderUser = event.getJDA().retrieveUserById(senderId).complete();
 
-            event.getMessage().reply("Sending " + senderReceiverMap.size() + " Secret Santa assignments. " + (isReal ? "" : "**This is just a test.**")).queue();
-            String testingChannelID = parameterService.getTestingChannelID();
-            event.getJDA().getTextChannelById(testingChannelID).sendMessage("Secret Santa assignments:\n" + answer).queue();
-
-            try {
-
-                senderReceiverMap.forEach((sender, receiver) -> {
-                    logger.info("Sending Secret Santa assignment to: {}, {}", sender, userMap.get(sender));
-                    String userId = userMap.get(sender);
-                    User user = event.getJDA().retrieveUserById(userId).complete();
-                    user.openPrivateChannel().queue(channel -> channel.sendMessage((isReal ? "**REAL**" : "**THIS IS JUST A TEST, SORRY FOR SPAM**") + " You are the Secret Santa for `" + receiver + "`.").queue());
-                    logger.info("Secret Santa assignment successfully sent to: {}", sender);
-                });
-
-                event.getMessage().reply("Secret Santa assignments have been sent out!").queue();
-
-            } catch (Exception exception) {
-                logger.error("An error occurred while sending out the Secret Santa assignments!", exception);
+            if (senderUser == null) {
+                logger.error("Could not fetch a sender JDA user object with this name: {}", senderName);
+                throw new SecretSantaException("Could not fetch a sender JDA user object with this name: " + senderName);
             }
 
-        }
+            final String messageForSender = "**Secret Krampus 2025**\nHello! " + (isReal ? "This is your **real** Secret Santa assignment: " : "This is just for **testing purposes**, here's your test assignment: `") + capitalizeFirstLetter(receiverName) + "`. Good luck!";
+            senderUser.openPrivateChannel().queue(channel -> channel.sendMessage(messageForSender).queue());
+            logger.info("A user {} has been sent a message that their receiver is {}", capitalizeFirstLetter(senderName), capitalizeFirstLetter(receiverName));
+        });
+
+        logger.info("Secret Santa assignments have been sent out!");
+        event.getMessage().reply("Secret Santa assignments have been successfully sent out! Good luck!").queue();
 
     }
 
