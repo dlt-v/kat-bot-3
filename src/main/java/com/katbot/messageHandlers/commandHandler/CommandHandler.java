@@ -30,10 +30,9 @@ public class CommandHandler implements Handler {
     public void handle(MessageReceivedEvent event) {
         String[] splitMessage = event.getMessage()
                 .getContentDisplay()
-                .toLowerCase()
                 .split("\\s+");
 
-        if (splitMessage.length > 0 && splitMessage[0].equals("kat")) {
+        if (splitMessage.length > 0 && splitMessage[0].equalsIgnoreCase("kat")) {
             Command command = commandMap.get(splitMessage[1]);
             if (command != null) {
                 String[] args = Arrays.copyOfRange(splitMessage, 2, splitMessage.length);
