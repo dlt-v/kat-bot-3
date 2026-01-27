@@ -26,7 +26,7 @@ public class SecretSantaCommand implements Command {
     private static final Logger logger = LoggerFactory.getLogger(SecretSantaCommand.class);
     private SecretSantaHistory secretSantaHistory;
 
-    private final String ROLE_NAME = "Krampus-25";
+    private final String ROLE_NAME = "Santa-25";
 
     public SecretSantaCommand(ParameterService parameterService) {
         this.parameterService = parameterService;
@@ -103,6 +103,9 @@ public class SecretSantaCommand implements Command {
         boolean isReal = Arrays.asList(args).contains("-real"); // Don't add it when testing the app
         if (isReal) logger.info("-real flag detected. Formatting messages accordingly.");
 
+        boolean sendOutToDms = Arrays.asList(args).contains("-sendout");
+        if (sendOutToDms) logger.info("-sendOut flag detected. Messages will be sent to participants.");
+
         this.secretSantaHistory = loadHistory();
 
         Map<String, List<String>> allPreviousPairs = fetchAllPreviousPairs();
@@ -124,7 +127,7 @@ public class SecretSantaCommand implements Command {
             displayDiagnosticInfo(event, allPreviousPairs, candidateList, assignments, isReal);
         }
 
-        sendAssignments(event, assignments, isReal);
+        sendAssignments(event, assignments, isReal, sendOutToDms);
     }
 
     private void displayDiagnosticInfo(MessageReceivedEvent event, Map<String, List<String>> allPreviousPairs, List<Member> candidateList, Map<String, String> assignments, boolean isReal) {
@@ -261,7 +264,7 @@ public class SecretSantaCommand implements Command {
         return assignments;
     }
 
-    private void sendAssignments(MessageReceivedEvent event, Map<String, String> assignmentMap, boolean isReal) {
+    private void sendAssignments(MessageReceivedEvent event, Map<String, String> assignmentMap, boolean isReal, boolean sendOut) {
 
         // Send the host message for debug.
         String answer = assignmentMap.entrySet().stream()
@@ -279,7 +282,11 @@ public class SecretSantaCommand implements Command {
         user.openPrivateChannel().queue(channel -> channel.sendMessage(finalAnswer).queue());
         logger.info("A debug message has been sent to Secret Santa host.");
 
-
+        if (!sendOut) {
+            logger.info("Process stop.");
+            event.getMessage().reply("Secret Santa assignments have been generated but have been **not** sent out.").queue();
+            return;
+        }
         // Sending a message to individual secret santa participant
         assignmentMap.forEach((senderName, receiverName) -> {
             String senderId = this.secretSantaHistory.getIdByUserName(senderName);
