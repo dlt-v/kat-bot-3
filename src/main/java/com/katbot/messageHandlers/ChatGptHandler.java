@@ -13,7 +13,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -27,15 +30,6 @@ public class ChatGptHandler implements Handler {
     @Override
     public void handle(MessageReceivedEvent event) {
         String userMessage = event.getAuthor().getName() + " wrote: " + event.getMessage().getContentDisplay().substring(4).trim();
-        // call the GPT-3 API
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + OPENAI_API_KEY);
-        headers.set("Content-Type", "application/json");
-
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("model", USED_MODEL);
-        List<Map<String, String>> messages = new ArrayList<>();
 
         String katBotInstructions = "You are KatBot, an edgy and sarcastic Khajiit Discord bot. Delta (or delta.v) is your creator. " +
                 "You have a personality of a worker who isn't paid enough for this crap. " +
@@ -44,13 +38,29 @@ public class ChatGptHandler implements Handler {
                 "If you are faced with a choice, you must pick one or the other. " +
                 "Write one or two simple sentences at most.";
 
-        messages.add(Map.of("role", "system", "content", katBotInstructions));
+        String botReply = makeApiRequest(userMessage, katBotInstructions, USED_MODEL);
+        event.getMessage().reply(botReply).queue();
+    }
+
+    public String makeApiRequest(String userMessage, String LLMInstructions, String usedModel) {
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + OPENAI_API_KEY);
+        headers.set("Content-Type", "application/json");
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("model", usedModel);
+        List<Map<String, String>> messages = new ArrayList<>();
+
+        messages.add(Map.of("role", "system", "content", LLMInstructions));
         messages.add(Map.of("role", "user", "content", userMessage));
 
         payload.put("messages", messages);
-        logger.info("User asked KatBot: {}", userMessage);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+
+
         try {
             ResponseEntity<String> response = restTemplate.exchange(OPENAI_API_URL, HttpMethod.POST, request, String.class);
             Assert.notNull(response.getBody(), "Response body is null");
@@ -59,12 +69,12 @@ public class ChatGptHandler implements Handler {
             JsonNode jsonResponse = objectMapper.readTree(response.getBody());
 
             String botReply = jsonResponse.path("choices").get(0).path("message").path("content").asText();
-            logger.info("KatBot replied: {}", botReply);
-            event.getMessage().reply(botReply).queue();
+            logger.info("KatBot replied: {}", botReply.length() > 100 ? botReply.substring(0, 100) + "..." : botReply);
+            return botReply;
 
         } catch (Exception e) {
             logger.error("Error processing GPT-3 request", e);
-            event.getChannel().sendMessage("Sorry, I couldn't process your request at the moment.").queue();
+            throw new RuntimeException("API request failed", e);
         }
     }
 
