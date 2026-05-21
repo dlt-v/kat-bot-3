@@ -46,7 +46,11 @@ public class VideoSummaryCommand implements Command {
             event.getMessage().reply(summary).queue();
         } catch (Exception e) {
             logger.error("An error occurred in the summarising video process: ", e);
-            String replyErrorMessage = e.getMessage().length() > 200 ? e.getMessage().substring(0, 200) + "..." : e.getMessage();
+            String errorMessage = e.getMessage();
+            if (errorMessage == null || errorMessage.isBlank()) {
+                errorMessage = e.getClass().getSimpleName();
+            }
+            String replyErrorMessage = errorMessage.length() > 200 ? errorMessage.substring(0, 200) + "..." : errorMessage;
             event.getChannel().sendMessage("An error occurred while fetching subtitles: " + replyErrorMessage).queue();
         }
 
