@@ -35,13 +35,14 @@ public class VideoSummaryCommand implements Command {
 
         try {
 
-            String cleanText = fetchTranscript(videoUrl, fileBaseName, event);
+            String cleanText = fetchTranscript(videoUrl, fileBaseName);
 
             String summary = prepareCall(cleanText);
 
             // TODO: Make it another thread? So it doesn't block the bot
             // Make sure the files are deleted, in batch?
             // Switch to Gemini because it's cheaper, way cheaper.
+            summary = summary.length() > 2000 ? summary.substring(0, 1995) + "..." : summary;
             event.getMessage().reply(summary).queue();
         } catch (Exception e) {
             logger.error("An error occurred in the summarising video process: ", e);
@@ -56,7 +57,7 @@ public class VideoSummaryCommand implements Command {
         return List.of("sumup");
     }
 
-    private String fetchTranscript(String videoUrl, String fileBaseName, MessageReceivedEvent event) throws Exception {
+    private String fetchTranscript(String videoUrl, String fileBaseName) throws Exception {
         // 1. Run yt-dlp to fetch subtitles.
         // For the god's sake, I can't make yt-dlp to just output to stdout.
         // Apparently it's a bug?  https://github.com/yt-dlp/yt-dlp/issues/9165
