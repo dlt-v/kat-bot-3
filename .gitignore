@@ -17,6 +17,7 @@ dataSources.xml
 *.iml
 *.ipr
 .env
+**/.idea/
 
 ### Eclipse ###
 .apt_generated
@@ -42,3 +43,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+*.srt
+*.tar
+
+dependency-reduced-pom.xml 
