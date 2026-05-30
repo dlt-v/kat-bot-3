@@ -81,7 +81,7 @@ Required GitHub Secrets:
 
 2. Copy the repository files you need to the VPS.
 
-   At minimum, keep the `docker-compose.yml` file and the `.env` file in the same directory.
+   At minimum, keep the `docker-compose.yml` file and a parent-directory `.env` file matching the compose file's `env_file: ../.env` path.
 
 3. Update the compose file to use the published image instead of building locally.
 
