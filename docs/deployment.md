@@ -62,7 +62,7 @@ What the workflow does:
 
 1. Checks out the repository.
 2. Sets up Java 17.
-3. For pull requests, runs a compile-only validation.
+3. For pull requests, runs a full Maven verify build, including tests.
 4. For pushes, logs in to Docker Hub using GitHub Secrets.
 5. Builds the image with Jib.
 6. Pushes the image to Docker Hub.

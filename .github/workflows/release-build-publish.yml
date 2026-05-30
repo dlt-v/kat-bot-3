@@ -30,3 +30,4 @@ jobs:
 
       - name: Validate, run tests, and build/push image
         run: mvn -Pprod clean verify jib:build
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'release/'))
