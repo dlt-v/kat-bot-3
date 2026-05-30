@@ -52,4 +52,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push image
-        run: mvn -Pprod -DskipTests clean compile jib:build
+        run: mvn -Pprod clean verify jib:build
