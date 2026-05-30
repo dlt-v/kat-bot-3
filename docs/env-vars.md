@@ -13,4 +13,4 @@ This file lists the environment variables the application expects and where they
 - `testing-user-id` — Optional but recommended: used to fetch footer/avatar in help/about commands.
 - `version` — Optional: displayed in help/about; if unset it shows `not set`.
 
-See the `.env.example` file in the project root for a template you can copy.
+See the `docker/.env.example` file in the project root for a template you can copy.

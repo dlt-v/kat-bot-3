@@ -1,77 +1,130 @@
-### KatBot 3.0 Deployment Guide
+### KatBot Deployment Guide
 
-*(In case I forget :))*
+KatBot3 now uses a registry-based workflow:
 
-### Local Build and Docker Image Creation
-
-1. **Build the JAR file**  
-   First, ensure that the application is packaged as a JAR file using Maven:
-
-   ```bash
-   mvn clean package
-   ```
-
-2. **Build the Docker Image**  
-   Once the JAR is ready, build the Docker image using the following command:
-
-   ```bash
-   docker build -t kat-bot:1.0 .
-   ```
-
-3. **Export the Docker Image as a `.tar` file**  
-   To export the Docker image to a `.tar` file for deployment, run:
-
-   ```bash
-   docker save -o kat-bot-1.0.tar kat-bot:1.0
-   ```
-
-   This will create a `kat-bot-1.0.tar` file that can be transferred to the remote server.
-
-### Remote Deployment
-
-The application is deployed on a VPS as a Docker container using the exported `.tar` file.
-
-1. **Transfer the Tarball**  
-   Use an SCP client like MobaXterm, WinSCP, or a GUI to transfer the `kat-bot-1.0.tar` file to your VPS.
-
-2. **Stop the previously running docker image**
-   First, stop the running docker container by running this command:
-   ```bash
-   docker stop <container_id/container_name>
-   ```
- 
-3. **Load the Docker Image**  
-   Once the tarball is on the VPS, log in to the server via SSH and run the following command to load the Docker image:
-
-   ```bash
-   docker load -i kat-bot-1.0.tar
-   ```
-
-4. **Run the Docker Container**  
-   After loading the image, you can run the container. Make sure you have an `.env` file with the required environment variables in the same directory.
-   For the container to connect to the database it has to be running in the same docker compose network. docker-compose.yaml should be already present on the VPS.
-
-   For a simple restart with the new image, take down the old image as usual and use this command (just make sure that the .yaml file is in the same directory as you)
-
-   ```bash
-   docker compose up -d
-   ```
-   - d - stands for detached mode - it means that Docker Compose will run your containers in the background
-
-And boom! You're done!
-
-If you want to check the console of the currently running container you can use:
-   ```bash
-   docker logs -f <image_name>
-   ```
-   
-   Where <image_name> is the generated name of the image.
-   -f - follow flag
+1. Maven builds and pushes Docker images with Jib, that's the manual way to do it.
+2. Additionally, GitHub Actions automatically builds and publishes images for `release/*` branches.
+3. The VPS pulls the published image from Docker Hub and runs it with Docker Compose.
 
 ---
 
-### Additional Notes
+### Prerequisites
 
-- Ensure that Docker is installed and running on both your local machine and the VPS.
-- Adjust any port mappings or environment variables as needed.
-- The `docker run` command can be modified to fit specific deployment needs, such as exposing different ports or passing additional parameters.
+Here's what's needed to make sure everything works:
+
+1. Git
+2. Java 17
+3. Maven (IntelliJ has it already, so optional maybe)
+4. Docker (logged in)
+5. Access to the GitHub repository (duh)
+
+Right now the built images are public so pulling from the VPS does not require a token.
+
+---
+
+### Local Development Setup
+
+1. Clone the repository.
+
+```bash
+git clone <your-repo-url>
+cd kat-bot-3
+```
+
+2. Open the project in your editor and copy or create your local environment file. (check `docker/.env.example` for reference)
+
+3. Verify the project compiles locally.
+
+```bash
+mvn -DskipTests clean compile
+```
+
+4. Build and push the Docker image manually when needed.
+
+```bash
+mvn -Pprod -DskipTests clean compile jib:build
+```
+
+This uses the `prod` profile from `pom.xml` and pushes the image to `deltaveee/kat-bot:<version>`.
+
+---
+
+### GitHub Actions Release Pipeline
+
+GitHub Actions handles the release workflow automatically.
+
+Trigger rules:
+
+1. A pull request targeting `release/*` runs a validation job.
+2. A push to `release/*` runs the publish job.
+
+What the workflow does:
+
+1. Checks out the repository.
+2. Sets up Java 17.
+3. For pull requests, runs a compile-only validation.
+4. For pushes, logs in to Docker Hub using GitHub Secrets.
+5. Builds the image with Jib.
+6. Pushes the image to Docker Hub.
+
+Required GitHub Secrets:
+
+- `DOCKERHUB_USERNAME` — Docker Hub username.
+- `DOCKERHUB_TOKEN` — a Docker Hub access token with read & write permission.
+
+---
+
+### VPS Setup
+
+1. Install Docker if it is not already installed.
+
+
+2. Copy the repository files you need to the VPS.
+
+   At minimum, keep the `docker-compose.yml` file and the `.env` file in the same directory.
+
+3. Update the compose file to use the published image instead of building locally.
+
+   Use a line like this for the `image` field in `docker-compose.yml`:
+
+```yaml
+image: deltaveee/kat-bot:1.2.0
+```
+
+4. Pull the latest image and start the containers.
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+5. When a newer image is published, repeat the same pull and restart commands.
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+---
+
+### Manual Release Checklist
+
+For consistency, it's better to create a PR to a `release/*` branch and let GitHub Actions handle the publishing. But just in case:
+
+1. Make sure the code is ready on a `release/*` branch.
+2. Push the branch or merge into it.
+3. Let GitHub Actions publish the image.
+4. On the VPS, run:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+---
+
+### Notes
+
+- Prefer version tags like `1.2.0` for deployment in yamls.
+- Avoid using `latest` for production unless you want the VPS to always track the newest push.
+- Don't store secrets in the repository? Duh?
