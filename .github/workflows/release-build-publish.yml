@@ -1,0 +1,33 @@
+name: Release Build and Publish
+
+on:
+  push:
+    branches:
+      - 'release/**'
+  workflow_dispatch:
+
+jobs:
+  validate-test-build-and-publish:
+    name: Validate, test, and publish Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Validate, run tests, and build/push image
+        run: mvn -Pprod clean verify jib:build
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && startsWith(github.ref_name, 'release/'))

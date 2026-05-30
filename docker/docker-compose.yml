@@ -1,13 +1,12 @@
 version: '3.8'
 services:
     katbot:
-        build: .
-        image: kat-bot:1.0
+        image: deltaveee/kat-bot:1.2.0
         ports:
             - "8080:8080"
             - "5005:5005"  # Expose the debugger port
         env_file:
-            - .env
+            - ../.env
         environment:
             # Enable remote debugging
             JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
