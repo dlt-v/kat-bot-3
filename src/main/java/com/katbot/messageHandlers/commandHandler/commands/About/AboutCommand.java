@@ -4,6 +4,7 @@ import com.katbot.messageHandlers.commandHandler.commands.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -11,6 +12,9 @@ import java.util.List;
 
 @Component
 public class AboutCommand implements Command {
+
+    @Value("${app.version}")
+    private String version;
 
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
@@ -25,7 +29,7 @@ public class AboutCommand implements Command {
                     .append("I'm currently in development, so expect some bugs and missing features.\n\n")
                     .append("If you have any suggestions or feedback, feel free to contact the author.\n\n")
                     .append("Use `kat help` to see available commands!\n\n")
-                    .append("Version: `").append(System.getenv("version")).append("`\n\n")
+                    .append("Version: `").append(version).append("`\n\n")
                     .append("[GitHub Repository Link](https://github.com/dlt-v/kat-bot-3)");
             embedBuilder.setDescription(description);
             embedBuilder.setColor(0xFFFF00);

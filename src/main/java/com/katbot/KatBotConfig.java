@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -19,6 +20,7 @@ import java.util.EnumSet;
 
 @Configuration
 @ComponentScan(basePackages = "com.katbot")
+@PropertySource("classpath:application.properties")
 public class KatBotConfig {
 
     @Bean

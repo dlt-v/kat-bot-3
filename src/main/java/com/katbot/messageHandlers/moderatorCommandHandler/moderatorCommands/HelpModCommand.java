@@ -3,6 +3,7 @@ package com.katbot.messageHandlers.moderatorCommandHandler.moderatorCommands;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,9 @@ public class HelpModCommand implements ModCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(HelpModCommand.class);
     private final List<ModCommand> modCommandsList;
+
+    @Value("${project.version:var_not_set!}")
+    private String version;
 
     HelpModCommand (List<ModCommand> modCommandsList) {
         this.modCommandsList = modCommandsList;
@@ -56,7 +60,7 @@ public class HelpModCommand implements ModCommand {
         description.append("\n\nIf you'd like to know more about a command, use `katmod help <command>`.");
         description.append("\nTo check user commands, use `kat help`.");
 
-        description.append("\n\nVersion: `").append(System.getenv("version")).append("`");
+        description.append("\n\nVersion: `").append(version).append("`");
 
         eb.setDescription(description);
     }

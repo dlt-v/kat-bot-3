@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.beans.factory.annotation.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,10 @@ import java.util.List;
 
 @Component
 public class HelpCommand implements Command {
+
+    @Value("${project.version}")
+    private String version;
+
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
 
@@ -125,11 +130,10 @@ public class HelpCommand implements Command {
         return resultEmbed;
     }
 
-    private static @NotNull EmbedBuilder buildDefaultCommand(User user) {
+    private @NotNull EmbedBuilder buildDefaultCommand(User user) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("KatBot Commands");
 
-        String version = System.getenv("version");
         version = version != null ? version : "not set";
 
         String descriptionTemplate = """
