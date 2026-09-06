@@ -3,6 +3,7 @@ package com.katbot.messageHandlers.moderatorCommandHandler.moderatorCommands;
 import com.katbot.messageHandlers.commandHandler.commands.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -113,7 +114,7 @@ public class AddRoleModCommand implements ModCommand, SlashCommand {
         }
 
         targetRole.delete().queue(
-                success -> event.reply("Role `" + targetRole.getName() + "` has been removed.").queue(),
+                success -> event.reply("Role @`" + targetRole.getName() + "` has been removed.").queue(),
                 error -> event.reply("Failed to delete role: " + error.getMessage()).setEphemeral(true).queue()
         );
     }
@@ -122,12 +123,18 @@ public class AddRoleModCommand implements ModCommand, SlashCommand {
         Role foundRole = event.getOption("target-role").getAsRole();
 
         try {
-            event.getGuild().getMembersWithRoles(foundRole).forEach(member -> {
+            List<Member> membersWithRole = event.getGuild().getMembersWithRoles(foundRole);
+            if (membersWithRole.isEmpty()) {
+                event.reply("No members found with role `" + foundRole.getName() + "`.").setEphemeral(true).queue();
+                return;
+            }
+            membersWithRole.forEach(member -> {
                 event.getGuild().removeRoleFromMember(member, foundRole).queue(
                         success -> log.info("Removed role {} from member {}", foundRole.getName(), member.getUser().getAsTag()),
                         error -> log.error("Failed to remove role {} from member {}: {}", foundRole.getName(), member.getUser().getAsTag(), error.getMessage())
                 );
             });
+            event.reply("All members have been removed from role `" + foundRole.getName() + "`. Total members removed: " + membersWithRole.size()).queue();
         } catch (Exception e) {
             log.error("Error while cleaning role {}: {}", foundRole.getName(), e.getMessage(), e);
             event.reply("Error while cleaning role `" + foundRole.getName() + "`: " + e.getMessage()).setEphemeral(true).queue();
