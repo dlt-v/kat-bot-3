@@ -22,6 +22,8 @@ import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
+import static com.katbot.util.ColorUtils.parseColorFromHexCode;
+
 @Component
 public class AddRoleModCommand implements ModCommand, SlashCommand {
 
@@ -323,15 +325,7 @@ public class AddRoleModCommand implements ModCommand, SlashCommand {
         return String.format("#%06x", nextInt);
     }
 
-    private Color parseColorFromHexCode(String hexCode) {
-        if (hexCode != null && hexCode.matches("^#?[0-9a-fA-F]{3}$")) {
-            String hex = hexCode.startsWith("#") ? hexCode.substring(1) : hexCode;
-            hexCode = "#" + hex.charAt(0) + hex.charAt(0)
-                    + hex.charAt(1) + hex.charAt(1)
-                    + hex.charAt(2) + hex.charAt(2);
-        }
-        return Color.decode(hexCode);
-    }
+
 
     @Override
     public String getShortDocs() {
