@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -47,7 +47,7 @@ public class ZabawaCommandTest {
         when(mockChannel.sendMessage(anyString())).thenReturn(mockMessageAction);
     }
 
-    @Test
+    @RepeatedTest(10)
     public void testZabawa() {
         when(mockMessage.getContentDisplay()).thenReturn("kat zabawa");
 
@@ -58,6 +58,9 @@ public class ZabawaCommandTest {
         verify(mockChannel).sendMessage(messageCaptor.capture());
 
         String responseMessage = messageCaptor.getValue();
-        assertTrue(responseMessage.matches("https://cdn\\.discordapp\\.com/attachments/\\d+/\\d+/[\\w-]+\\.mp4|mov\n"), "Response should match the pattern.");
+        assertTrue(
+                responseMessage.matches("(?i)^https://cdn\\.discordapp\\.com/attachments/\\d+/\\d+/[\\w.-]+\\.(mp4|mov)\n?$"),
+                "Response should match the pattern."
+        );
     }
 }
