@@ -1,6 +1,7 @@
 package com.katbot.eventListeners;
 
 import com.katbot.messageHandlers.commandHandler.commands.SlashCommand;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -46,6 +47,14 @@ public class SlashCommandListener extends ListenerAdapter {
             command.execute(event);
         } else {
             event.reply("Command not recognized.").setEphemeral(true).queue();
+        }
+    }
+
+    @Override
+    public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
+        SlashCommand command = commandMap.get(event.getName().toLowerCase());
+        if (command != null) {
+            command.onAutoComplete(event);
         }
     }
 }
