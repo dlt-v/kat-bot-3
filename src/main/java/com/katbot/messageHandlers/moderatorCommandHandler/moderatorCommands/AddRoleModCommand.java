@@ -89,18 +89,20 @@ public class AddRoleModCommand implements ModCommand, SlashCommand {
             return;
         }
 
-        try {
+try {
+    event.deferReply().queue(hook ->
             event.getGuild().createRole().setName(roleName).setColor(color).queue(
                     role -> {
                         role.getManager().setMentionable(true).queue();
-                        event.reply("Role <@&" + role.getId() + "> has been created.").queue();
+                        hook.editOriginal("Role <@&" + role.getId() + "> has been created.").queue();
                     },
-                    error -> event.reply("Failed to create role: " + error.getMessage()).setEphemeral(true).queue()
-            );
-        } catch (Exception e) {
-            log.error("Error while creating role: {}", e.getMessage(), e);
-            event.reply("Error: `" + e.getMessage() + "`").setEphemeral(true).queue();
-        }
+                    error -> hook.editOriginal("Failed to create role: " + error.getMessage()).queue()
+            )
+    );
+} catch (Exception e) {
+    log.error("Error while creating role: {}", e.getMessage(), e);
+    event.reply("Error: `" + e.getMessage() + "`").setEphemeral(true).queue();
+}
 
     }
 
