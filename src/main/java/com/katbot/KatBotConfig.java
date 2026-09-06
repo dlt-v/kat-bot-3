@@ -3,6 +3,7 @@ package com.katbot;
 import com.katbot.eventListeners.ButtonInteractionListener;
 import com.katbot.eventListeners.GuildMessageListener;
 import com.katbot.eventListeners.ReactionInteractionListener;
+import com.katbot.eventListeners.SlashCommandListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -43,7 +44,8 @@ public class KatBotConfig {
     public JDA jda (
             GuildMessageListener guildMessageListener,
             ButtonInteractionListener buttonInteractionListener,
-            ReactionInteractionListener reactionInteractionListener
+            ReactionInteractionListener reactionInteractionListener,
+            SlashCommandListener slashCommandListener
     ) throws Exception {
         EnumSet<GatewayIntent> intents = EnumSet.of(
                 GatewayIntent.GUILD_MESSAGES,
@@ -64,7 +66,7 @@ public class KatBotConfig {
         builder.setMemberCachePolicy(MemberCachePolicy.lru(20));
 
         // Add event listeners
-        builder.addEventListeners(guildMessageListener, buttonInteractionListener, reactionInteractionListener);
+        builder.addEventListeners(guildMessageListener, buttonInteractionListener, reactionInteractionListener, slashCommandListener);
 
         // Build and return JDA instance
         return builder.build();

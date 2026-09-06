@@ -58,7 +58,9 @@ public class ZabawaCommandTest {
         verify(mockChannel).sendMessage(messageCaptor.capture());
 
         String responseMessage = messageCaptor.getValue();
-        assertTrue(responseMessage.matches("(?i)https://cdn\\.discordapp\\.com/attachments/\\d+/\\d+/[\\w.\\s-]+\\.(mp4|mov)"),
-                "Response should match the pattern.");
+        assertTrue(
+                responseMessage.matches("(?i)^https://cdn\\.discordapp\\.com/attachments/\\d+/\\d+/[\\w.-]+\\.(mp4|mov)\n?$"),
+                "Response should match the pattern."
+        );
     }
 }

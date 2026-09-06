@@ -17,7 +17,8 @@ dataSources.xml
 *.iml
 *.ipr
 .env
-**/.idea/
+.idea/
+.vscode/
 
 ### Eclipse ###
 .apt_generated

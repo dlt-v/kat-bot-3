@@ -91,17 +91,17 @@ Required GitHub Secrets:
 image: deltaveee/kat-bot:1.2.0
 ```
 
-4. Pull the latest image and start the containers.
+4. Pull the latest image (for only KatBot) and start the containers.
 
 ```bash
-docker compose pull
+docker compose pull katbot
 docker compose up -d
 ```
 
 5. When a newer image is published, repeat the same pull and restart commands.
 
 ```bash
-docker compose pull
+docker compose pull katbot
 docker compose up -d
 ```
 
