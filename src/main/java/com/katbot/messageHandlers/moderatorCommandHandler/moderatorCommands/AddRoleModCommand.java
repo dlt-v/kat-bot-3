@@ -119,8 +119,20 @@ public class AddRoleModCommand implements ModCommand, SlashCommand {
     }
 
     private void handleSlashClean(SlashCommandInteractionEvent event) {
-        // TODO: Feature pending implementation
-        event.reply("Sorry, `role clean` functionality is not implemented yet!").setEphemeral(true).queue();
+        Role foundRole = event.getOption("target-role").getAsRole();
+
+        try {
+            event.getGuild().getMembersWithRoles(foundRole).forEach(member -> {
+                event.getGuild().removeRoleFromMember(member, foundRole).queue(
+                        success -> log.info("Removed role {} from member {}", foundRole.getName(), member.getUser().getAsTag()),
+                        error -> log.error("Failed to remove role {} from member {}: {}", foundRole.getName(), member.getUser().getAsTag(), error.getMessage())
+                );
+            });
+        } catch (Exception e) {
+            log.error("Error while cleaning role {}: {}", foundRole.getName(), e.getMessage(), e);
+            event.reply("Error while cleaning role `" + foundRole.getName() + "`: " + e.getMessage()).setEphemeral(true).queue();
+        }
+
     }
 
     private void handleSlashBanner(SlashCommandInteractionEvent event) {
