@@ -18,7 +18,6 @@ dataSources.xml
 *.ipr
 .env
 .idea/
-.github/
 .vscode/
 
 ### Eclipse ###
