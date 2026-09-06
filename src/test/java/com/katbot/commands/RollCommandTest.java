@@ -1,4 +1,4 @@
-package com.katbot.commands.commands;
+package com.katbot.commands;
 
 import com.katbot.messageHandlers.commandHandler.commands.Roll.RollCommand;
 import net.dv8tion.jda.api.entities.Message;
