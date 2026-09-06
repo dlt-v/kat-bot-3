@@ -29,12 +29,12 @@ public class AboutCommand implements Command, SlashCommand {
         );
     }
 
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        buildAboutEmbed(event.getJDA(), embed ->
-                event.replyEmbeds(embed).queue()
-        );
-    }
+@Override
+public void execute(SlashCommandInteractionEvent event) {
+    event.deferReply().queue(hook ->
+            buildAboutEmbed(event.getJDA(), embed -> hook.editOriginalEmbeds(embed).queue())
+    );
+}
 
     private void buildAboutEmbed(JDA jda, Consumer<MessageEmbed> callback) {
         jda.retrieveUserById(System.getenv("testing-user-id")).queue(user -> {
